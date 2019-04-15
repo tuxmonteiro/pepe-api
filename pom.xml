@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.globo.pepe</groupId>
 	<artifactId>pepe-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+    <version>${pepe.version}-SNAPSHOT</version>
 	<name>pepe-api</name>
 	<description>Pepe API - An Event Receiver and Gateway</description>
     <scm>
@@ -29,6 +29,31 @@
         <distribution>repo</distribution>
       </license>
     </licenses>
+    <profiles>
+      <profile>
+          <id>version-defined</id>
+          <activation>
+            <property>
+              <name>env.PEPE_VERSION</name>
+            </property>
+          </activation>
+          <properties>
+            <pepe.version>${env.PEPE_VERSION}</pepe.version>
+          </properties>
+      </profile>
+      <profile>
+          <id>version-undefined</id>
+          <activation>
+            <property>
+              <name>!env.PEPE_VERSION</name>
+            </property>
+          </activation>
+          <properties>
+            <pepe.version>0.0.0</pepe.version>
+          </properties>
+      </profile>
+    </profiles>
+
 
 	<properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

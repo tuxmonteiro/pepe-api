@@ -16,3 +16,6 @@
 *.iml
 *.ipr
 
+### Binaries
+*.rpm
+vendor/
