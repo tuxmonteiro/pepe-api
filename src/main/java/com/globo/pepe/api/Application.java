@@ -1,4 +1,4 @@
-package com.globo.pepe.pepeapi;
+package com.globo.pepe.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

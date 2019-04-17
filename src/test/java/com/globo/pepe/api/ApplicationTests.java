@@ -1,4 +1,4 @@
-package com.globo.pepe.pepeapi;
+package com.globo.pepe.api;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
