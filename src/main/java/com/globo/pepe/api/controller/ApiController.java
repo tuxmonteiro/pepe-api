@@ -42,7 +42,7 @@ public class ApiController {
     public ResponseEntity<JsonNode> post(@RequestBody JsonNode body) {
         String token = Optional.ofNullable(body.get("token")).orElse(mapper.createObjectNode()).asText();
         String project = Optional.ofNullable(body.get("project")).orElse(mapper.createObjectNode()).asText();
-        if (keystoneService.ignore(token == null || token.isEmpty() || project == null || project.isEmpty()).isValid(project, token)) {
+        if (keystoneService.ignore(token.isEmpty() || project.isEmpty()).isValid(project, token)) {
             return ResponseEntity.created(URI.create("/api")).body(body);
         }
         return ResponseEntity.status(401).body(mapper.createObjectNode());

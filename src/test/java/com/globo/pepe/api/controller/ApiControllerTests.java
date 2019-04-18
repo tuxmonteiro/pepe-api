@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globo.pepe.api;
+package com.globo.pepe.api.controller;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -22,7 +22,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.globo.pepe.api.controller.ApiController;
 import com.globo.pepe.api.services.KeystoneService;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,33 +52,26 @@ public class ApiControllerTests {
 
         InputStream resourceAuthOk = ApiControllerTests.class.getResourceAsStream("/keystone-auth.json");
         String bodyAuthOk = IOUtils.toString(resourceAuthOk, Charset.defaultCharset());
-        mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody("{\n"
-            + "  \"auth\" : {\n"
-            + "    \"identity\" : {\n"
-            + "      \"token\" : {\n"
-            + "        \"id\" : \"token-ok\"\n"
-            + "      },\n"
-            + "      \"methods\" : [ \"token\" ]\n"
-            + "    },\n"
-            + "    \"scope\" : {\n"
-            + "      \"project\" : {\n"
-            + "        \"name\" : \"admin\",\n"
-            + "        \"domain\" : {\n"
-            + "          \"name\" : \"default\"\n"
-            + "        }\n"
-            + "      }\n"
-            + "    }\n"
-            + "  }\n"
-            + "}"))
+        mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody(requestBody("token-ok")))
             .respond(response().withBody(bodyAuthOk).withHeader("Content-Type", APPLICATION_JSON_VALUE).withStatusCode(201));
 
         InputStream resourceAuthFail = ApiControllerTests.class.getResourceAsStream("/keystone-auth-fail.json");
         String bodyAuthFail = IOUtils.toString(resourceAuthFail, Charset.defaultCharset());
-        mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody("{\n"
+        mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody(requestBody("wrong-token")))
+            .respond(response().withBody(bodyAuthFail).withHeader("Content-Type", APPLICATION_JSON_VALUE).withStatusCode(401));
+
+        String bodyKeystoneError = "";
+        mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody(requestBody("force-error")))
+            .respond(response().withBody(bodyKeystoneError).withHeader("Content-Type", APPLICATION_JSON_VALUE).withStatusCode(201));
+
+    }
+
+    private static String requestBody(String token) {
+        return "{\n"
             + "  \"auth\" : {\n"
             + "    \"identity\" : {\n"
             + "      \"token\" : {\n"
-            + "        \"id\" : \"wrong-token\"\n"
+            + "        \"id\" : \"" + token + "\"\n"
             + "      },\n"
             + "      \"methods\" : [ \"token\" ]\n"
             + "    },\n"
@@ -92,9 +84,7 @@ public class ApiControllerTests {
             + "      }\n"
             + "    }\n"
             + "  }\n"
-            + "}"))
-            .respond(response().withBody(bodyAuthFail).withHeader("Content-Type", APPLICATION_JSON_VALUE).withStatusCode(401));
-
+            + "}";
     }
 
     @AfterClass
@@ -105,8 +95,22 @@ public class ApiControllerTests {
     }
 
     @Test
-    public void apiControllerNotAuthenticated() throws Exception {
+    public void apiControllerNotAuthenticatedBothUndef() throws Exception {
         String eventWithoutAuth = "{}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+    }
+
+    @Test
+    public void apiControllerNotAuthenticatedTokenUndef() throws Exception {
+        String eventWithoutAuth = "{\"project\":\"admin\"}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+    }
+
+    @Test
+    public void apiControllerNotAuthenticatedProjectUndef() throws Exception {
+        String eventWithoutAuth = "{\"token\":\"token-ok\"}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
@@ -121,6 +125,13 @@ public class ApiControllerTests {
     @Test
     public void apiControllerAuthenticationFail() throws Exception {
         String eventWithAuthFail = "{\"token\":\"wrong-token\",\"project\":\"admin\"}";
+        mockMvc.perform(post("/api").content(eventWithAuthFail)
+            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void apiControllerKeystoneError() throws Exception {
+        String eventWithAuthFail = "{\"token\":\"force-error\",\"project\":\"admin\"}";
         mockMvc.perform(post("/api").content(eventWithAuthFail)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }

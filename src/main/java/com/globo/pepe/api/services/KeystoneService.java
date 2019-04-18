@@ -16,6 +16,8 @@
 
 package com.globo.pepe.api.services;
 
+import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
+
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +25,7 @@ import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.common.Identifier;
 import org.openstack4j.model.identity.v3.Token;
+import org.openstack4j.model.identity.v3.User;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.stereotype.Component;
 
@@ -43,17 +46,25 @@ public class KeystoneService {
     public boolean isValid(String project, String token) {
         if (ignore) return true;
         try {
-            Token tokenOSv3 = authenticate(KEYSTONE_URL, project, token).getToken();
-            return tokenOSv3 != null && tokenOSv3.getUser() != null;
-        } catch (AuthenticationException e) {
+            OSClientV3 osClientV3;
+            Token tokenOSv3;
+            throwIfNull(osClientV3 = authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
+            throwIfNull(tokenOSv3 = osClientV3.getToken(), getAuthException(Token.class.getSimpleName()));
+            throwIfNull(tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
+            return true;
+        } catch (RuntimeException e) {
             LOGGER.error(e.getMessage());
         }
         return false;
     }
 
-    public OSClientV3 authenticate(String url, String project, String token) throws AuthenticationException {
+    private AuthenticationException getAuthException(String objName) {
+        return new AuthenticationException("{\"error\":\"" + objName + " is null\"}", 401);
+    }
+
+    private OSClientV3 authenticate(String project, String token) throws RuntimeException {
         return OSFactory.builderV3()
-            .endpoint(url)
+            .endpoint(KEYSTONE_URL)
             .token(token)
             .scopeToProject(Identifier.byName(project), Identifier.byName(KEYSTONE_DOMAIN_CONTEXT))
             .authenticate();
