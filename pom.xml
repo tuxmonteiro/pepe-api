@@ -89,6 +89,11 @@
       <artifactId>openstack4j</artifactId>
       <version>3.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.amqp</groupId>
+      <artifactId>spring-rabbit</artifactId>
+      <version>2.1.5.RELEASE</version>
+    </dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -111,6 +116,12 @@
       <groupId>org.mock-server</groupId>
       <artifactId>mockserver-client-java</artifactId>
       <version>5.5.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.fridujo</groupId>
+      <artifactId>rabbitmq-mock</artifactId>
+      <version>1.0.10</version>
       <scope>test</scope>
     </dependency>
 	</dependencies>
