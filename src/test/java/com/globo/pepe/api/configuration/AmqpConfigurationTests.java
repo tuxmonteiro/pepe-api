@@ -16,17 +16,36 @@
 
 package com.globo.pepe.api.configuration;
 
+import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = AmqpConfiguration.class, loader = AnnotationConfigContextLoader.class)
 public class AmqpConfigurationTests {
 
-    private final AmqpConfiguration amqpConfiguration = new AmqpConfiguration();
+    @Autowired
+    private ConnectionFactory connectionFactory;
+
+    @Test
+    public void connectionFactoryIsNotMock() {
+        Assert.assertFalse(((AbstractConnectionFactory)connectionFactory).getRabbitConnectionFactory() instanceof MockConnectionFactory);
+    }
 
     @Test
     public void connectionFactoryNotNullTest() {
-        assertNotNull(amqpConfiguration.connectionFactory());
+        assertNotNull(connectionFactory);
     }
 
 }

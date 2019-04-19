@@ -48,6 +48,10 @@ public class AmqpService {
         this.admin = new RabbitAdmin(connectionFactory);
     }
 
+    public ConnectionFactory connectionFactory() {
+        return connectionFactory;
+    }
+
     public void convertAndSend(String queue, String message) {
         template.convertAndSend(queue, message);
     }

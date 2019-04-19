@@ -20,23 +20,32 @@ package com.globo.pepe.api.services;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.globo.pepe.api.configuration.AmqpConfiguration;
+import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.globo.pepe.api.mocks.AmqpMockConfiguration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(value = {AmqpService.class, AmqpMockConfiguration.class}, excludeAutoConfiguration = AmqpConfiguration.class)
+@SpringBootTest
+@ContextConfiguration(classes = {AmqpService.class, AmqpMockConfiguration.class}, loader = AnnotationConfigContextLoader.class)
 public class AmqpServiceTests {
 
     @Autowired
     public AmqpService amqpService;
+
+    @Test
+    public void connectionFactoryIsMock() {
+        assertTrue(((AbstractConnectionFactory)amqpService.connectionFactory()).getRabbitConnectionFactory() instanceof MockConnectionFactory);
+    }
 
     @Ignore
     @Test
