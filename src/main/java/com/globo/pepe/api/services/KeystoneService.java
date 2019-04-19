@@ -18,7 +18,6 @@ package com.globo.pepe.api.services;
 
 import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
 
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openstack4j.api.OSClient.OSClientV3;
@@ -27,14 +26,16 @@ import org.openstack4j.model.common.Identifier;
 import org.openstack4j.model.identity.v3.Token;
 import org.openstack4j.model.identity.v3.User;
 import org.openstack4j.openstack.OSFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KeystoneService {
 
-    private static final Logger LOGGER                  = LogManager.getLogger();
-    private static final String KEYSTONE_URL            = Optional.ofNullable(System.getenv("KEYSTONE_URL")).orElse("http://127.0.0.1:5000/v3");
-    private static final String KEYSTONE_DOMAIN_CONTEXT = Optional.ofNullable(System.getenv("KEYSTONE_DOMAIN_CONTEXT")).orElse("default");
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    @Value("${keystone.url}") String keystoneUrl;
+    @Value("${keystone.domain}") String keystoneDomainContext;
 
     private boolean ignore = false;
 
@@ -64,9 +65,9 @@ public class KeystoneService {
 
     private OSClientV3 authenticate(String project, String token) throws RuntimeException {
         return OSFactory.builderV3()
-            .endpoint(KEYSTONE_URL)
+            .endpoint(keystoneUrl)
             .token(token)
-            .scopeToProject(Identifier.byName(project), Identifier.byName(KEYSTONE_DOMAIN_CONTEXT))
+            .scopeToProject(Identifier.byName(project), Identifier.byName(keystoneDomainContext))
             .authenticate();
     }
 }

@@ -1,1 +1,6 @@
+keystone:
+  url: ${KEYSTONE_URL:http://127.0.0.1:5000/v3}
+  domain: ${KEYSTONE_DOMAIN_CONTEXT:default}
 
+amqp:
+  url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}

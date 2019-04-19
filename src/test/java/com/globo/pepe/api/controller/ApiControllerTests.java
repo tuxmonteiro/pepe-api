@@ -34,11 +34,16 @@ import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({ApiController.class, KeystoneService.class})
+@TestPropertySource(properties = {
+        "keystone.url=http://127.0.0.1:5000/v3",
+        "keystone.domain=default"
+})
 public class ApiControllerTests {
 
     @Autowired

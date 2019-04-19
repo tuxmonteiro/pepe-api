@@ -17,19 +17,19 @@
 package com.globo.pepe.api.configuration;
 
 import java.net.URI;
-import java.util.Optional;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AmqpConfiguration {
 
-    private static final String RABBIT_URI = Optional.ofNullable(System.getenv("RABBIT_URI")).orElse("amqp://guest:guest@127.0.0.1");
+    @Value("${amqp.url}") String amqpUrl;
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        return new CachingConnectionFactory(URI.create(RABBIT_URI));
+        return new CachingConnectionFactory(URI.create(amqpUrl));
     }
 }

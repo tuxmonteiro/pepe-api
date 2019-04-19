@@ -19,11 +19,14 @@ package com.globo.pepe.api.mocks;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class AmqpMockConfiguration {
+
+    @Value("${amqp.url}") String amqpUrl;
 
     @Bean
     public ConnectionFactory connectionFactory() {

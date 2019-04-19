@@ -1,0 +1,34 @@
+{
+  "properties": [
+    {
+      "name": "keystone.url",
+      "type": "java.lang.String",
+      "description": "keystone.url"
+    },
+    {
+      "name": "keystone.domain",
+      "type": "java.lang.String",
+      "description": "keystone.domain"
+    },
+    {
+      "name": "amqp.url",
+      "type": "java.lang.String",
+      "description": "amqp.url"
+    },
+    {
+      "name": "build.project",
+      "type": "java.lang.String",
+      "description": "Maven build.project."
+    },
+    {
+      "name": "build.version",
+      "type": "java.lang.String",
+      "description": "Maven build.version."
+    },
+    {
+      "name": "build.timestamp",
+      "type": "java.lang.String",
+      "description": "Maven build.timestamp."
+    }
+  ]
+}
