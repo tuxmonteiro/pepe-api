@@ -100,44 +100,101 @@ public class ApiControllerTests {
     }
 
     @Test
+    public void idMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"payload\":{},\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void metadataMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void payloadMissingTests() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void metadataSourceMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":{\"timestamp\":0}}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void metadataTimestampMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":{\"source\":\"xxx\"}}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void apiControllerNotAuthenticatedBothUndef() throws Exception {
-        String eventWithoutAuth = "{}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerNotAuthenticatedTokenUndef() throws Exception {
-        String eventWithoutAuth = "{\"project\":\"admin\"}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerNotAuthenticatedProjectUndef() throws Exception {
-        String eventWithoutAuth = "{\"token\":\"token-ok\"}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"token\":\"token-ok\",\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerAuthenticationOk() throws Exception {
-        String eventWithAuthOK = "{\"token\":\"token-ok\",\"project\":\"admin\"}";
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"token\":\"token-ok\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithAuthOK)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerAuthenticationFail() throws Exception {
-        String eventWithAuthFail = "{\"token\":\"wrong-token\",\"project\":\"admin\"}";
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"token\":\"wrong-token\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithAuthFail)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void apiControllerKeystoneError() throws Exception {
-        String eventWithAuthFail = "{\"token\":\"force-error\",\"project\":\"admin\"}";
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"token\":\"force-error\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
         mockMvc.perform(post("/api").content(eventWithAuthFail)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void customAttributesTest() throws Exception {
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{}," +
+                "\"metadata\":{" +
+                    "\"token\":\"token-ok\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0," +
+                    "\"custom_attributes\":{" +
+                        "\"component\":\"xxx\",\"subcomponent\":\"xxx\"}}}";
+        mockMvc.perform(post("/api").content(eventWithAuthOK)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 }
