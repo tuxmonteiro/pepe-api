@@ -48,7 +48,7 @@ public class KeystoneService {
     public boolean isValid(String project, String token) {
         if (ignore) return true;
         try {
-            return !getUserId(project, token).isEmpty();
+            return userExist(project, token);
         } catch (RuntimeException e) {
             LOGGER.error(e.getMessage());
         }
@@ -68,13 +68,12 @@ public class KeystoneService {
     }
 
     @Cacheable(cacheNames = "userids", key = "{#project,#token}", unless="#result == null")
-    public String getUserId(String project, String token) throws RuntimeException {
+    public boolean userExist(String project, String token) throws RuntimeException {
         OSClientV3 osClientV3;
         Token tokenOSv3;
-        User user;
         throwIfNull(osClientV3 = authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
         throwIfNull(tokenOSv3 = osClientV3.getToken(), getAuthException(Token.class.getSimpleName()));
-        throwIfNull(user = tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
-        return user.getId();
+        throwIfNull(tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
+        return true;
     }
 }
