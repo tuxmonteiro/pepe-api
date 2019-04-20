@@ -17,14 +17,8 @@
 package com.globo.pepe.api.services;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.globo.pepe.api.mocks.AmqpMockConfiguration;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
@@ -33,6 +27,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,13 +47,11 @@ public class AmqpServiceTests {
         assertTrue(((AbstractConnectionFactory)amqpService.connectionFactory()).getRabbitConnectionFactory() instanceof MockConnectionFactory);
     }
 
-    @Ignore
     @Test
-    public void sendMessageTest() throws InterruptedException {
+    public void convertAndSendTest() throws InterruptedException {
         String queueName="test";
         String originalMessage="message";
         amqpService.newQueue(queueName);
-        amqpService.startListeners(queueName);
         CountDownLatch latch = new CountDownLatch(1);
         amqpService.registerListener(queueName, message -> {
             assertEquals("not original message", originalMessage, new String(message.getBody()));
@@ -63,5 +61,10 @@ public class AmqpServiceTests {
         amqpService.convertAndSend(queueName, originalMessage);
         assertTrue(latch.await(5, TimeUnit.SECONDS));
         amqpService.stopListener(queueName);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void stopListenerWithoutQueueTest() {
+        amqpService.stopListener("not-found");
     }
 }

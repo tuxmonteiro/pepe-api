@@ -16,12 +16,16 @@
 
 package com.globo.pepe.api.configuration;
 
-import java.net.URI;
+import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.net.URI;
 
 @Configuration
 public class AmqpConfiguration {
@@ -31,5 +35,20 @@ public class AmqpConfiguration {
     @Bean
     public ConnectionFactory connectionFactory() {
         return new CachingConnectionFactory(URI.create(amqpUrl));
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        return new RabbitTemplate(connectionFactory);
+    }
+
+    @Bean
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
+    }
+
+    @Bean
+    public AsyncRabbitTemplate asyncRabbitTemplate(RabbitTemplate rabbitTemplate) {
+        return new AsyncRabbitTemplate(rabbitTemplate);
     }
 }

@@ -16,36 +16,34 @@
 
 package com.globo.pepe.api.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class AmqpService {
 
+
+    private final RabbitTemplate template;
+    private final RabbitAdmin admin;
     private final ConnectionFactory connectionFactory;
-    private final AmqpTemplate template;
-    private final AmqpAdmin admin;
 
     private final Map<String, SimpleMessageListenerContainer> messageListenerContainerMap = new HashMap<>();
     private final Map<String, List<MessageListener>> messageListeners = new HashMap<>();
 
-    @Autowired
-    public AmqpService(ConnectionFactory connectionFactory) {
+    public AmqpService(ConnectionFactory connectionFactory, RabbitTemplate template, RabbitAdmin admin) {
         this.connectionFactory = connectionFactory;
-        this.template = new RabbitTemplate(connectionFactory);
-        this.admin = new RabbitAdmin(connectionFactory);
+        this.template = template;
+        this.admin = admin;
     }
 
     public ConnectionFactory connectionFactory() {
@@ -54,10 +52,6 @@ public class AmqpService {
 
     public void convertAndSend(String queue, String message) {
         template.convertAndSend(queue, message);
-    }
-
-    public Object convertSendAndReceive(String queue, Object message) {
-        return template.convertSendAndReceive(queue, message);
     }
 
     public String newQueue(String queueName) {
@@ -69,18 +63,19 @@ public class AmqpService {
 
     private MessageListener messageListener(String queueName) {
         return message -> {
-            for (MessageListener messageListener: messageListeners.computeIfAbsent(queueName, k -> new ArrayList<>())) {
+            for (MessageListener messageListener: messageListeners.get(queueName)) {
                 messageListener.onMessage(message);
             }
         };
     }
 
-    public void startListeners(String queueName) {
+    private void startListeners(String queueName) {
         final SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addQueueNames(queueName);
         messageListeners.put(queueName, new ArrayList<>());
         container.setMessageListener(messageListener(queueName));
+        container.start();
         messageListenerContainerMap.put(queueName, container);
     }
 
@@ -90,6 +85,8 @@ public class AmqpService {
             container.shutdown();
             messageListeners.remove(queueName);
             messageListenerContainerMap.remove(queueName);
+        } else {
+            throw new IllegalStateException("queue not exist");
         }
     }
 
