@@ -1,0 +1,12 @@
+keystone:
+  url: http://127.0.0.1:5000/v3
+  domain: default
+
+amqp:
+  url: amqp://guest:guest@127.0.0.1
+
+spring:
+  cache:
+    cache-names: userids
+    caffeine:
+      spec: maximumSize=500, expireAfterAccess=60s

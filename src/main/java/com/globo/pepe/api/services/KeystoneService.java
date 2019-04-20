@@ -27,6 +27,7 @@ import org.openstack4j.model.identity.v3.Token;
 import org.openstack4j.model.identity.v3.User;
 import org.openstack4j.openstack.OSFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,12 +48,7 @@ public class KeystoneService {
     public boolean isValid(String project, String token) {
         if (ignore) return true;
         try {
-            OSClientV3 osClientV3;
-            Token tokenOSv3;
-            throwIfNull(osClientV3 = authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
-            throwIfNull(tokenOSv3 = osClientV3.getToken(), getAuthException(Token.class.getSimpleName()));
-            throwIfNull(tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
-            return true;
+            return !getUserId(project, token).isEmpty();
         } catch (RuntimeException e) {
             LOGGER.error(e.getMessage());
         }
@@ -69,5 +65,16 @@ public class KeystoneService {
             .token(token)
             .scopeToProject(Identifier.byName(project), Identifier.byName(keystoneDomainContext))
             .authenticate();
+    }
+
+    @Cacheable(cacheNames = "userids", key = "{#project,#token}", unless="#result == null")
+    public String getUserId(String project, String token) throws RuntimeException {
+        OSClientV3 osClientV3;
+        Token tokenOSv3;
+        User user;
+        throwIfNull(osClientV3 = authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
+        throwIfNull(tokenOSv3 = osClientV3.getToken(), getAuthException(Token.class.getSimpleName()));
+        throwIfNull(user = tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
+        return user.getId();
     }
 }
