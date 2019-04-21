@@ -16,40 +16,73 @@
 
 package com.globo.pepe.api.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFactory;
+import com.globo.pepe.api.model.Metadata;
+import com.globo.pepe.api.services.AmqpService;
+import com.globo.pepe.api.services.KeystoneService;
+import org.apache.commons.io.IOUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockserver.integration.ClientAndServer;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+
+import static com.globo.pepe.api.controller.ApiController.QUEUE_TRIGGER_PREFIX;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.globo.pepe.api.services.KeystoneService;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import org.apache.commons.io.IOUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockserver.integration.ClientAndServer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-
 @RunWith(SpringRunner.class)
-@WebMvcTest({ApiController.class, KeystoneService.class})
+@WebMvcTest({ApiController.class, KeystoneService.class, AmqpService.class})
 @TestPropertySource(properties = {
         "keystone.url=http://127.0.0.1:5000/v3",
         "keystone.domain=default"
 })
 public class ApiControllerTests {
 
+    @MockBean
+    private ConnectionFactory connectionFactory;
+
+    @MockBean
+    private RabbitTemplate rabbitTemplate;
+
+    @MockBean
+    private RabbitAdmin rabbitAdmin;
+
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private AmqpService amqpService;
+
     private static ClientAndServer mockServer;
+
+    private static final ObjectMapper MAPPER = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     @BeforeClass
     public static void setupClass() throws IOException {
@@ -69,6 +102,13 @@ public class ApiControllerTests {
         mockServer.when(request().withMethod("POST").withPath("/v3/auth/tokens").withBody(requestBody("force-error")))
             .respond(response().withBody(bodyKeystoneError).withHeader("Content-Type", APPLICATION_JSON_VALUE).withStatusCode(201));
 
+    }
+
+    @Before
+    public void setup() {
+        connectionFactory = new CachingConnectionFactory(MockConnectionFactoryFactory.build());
+        rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitAdmin = new RabbitAdmin(connectionFactory);
     }
 
     private static String requestBody(String token) {
@@ -91,6 +131,51 @@ public class ApiControllerTests {
             + "  }\n"
             + "}";
     }
+    private JsonNode metadata(String project, String token, String source, Long timestamp, String triggerName) {
+        final Metadata metadata = new Metadata()
+                .setProject(project)
+                .setToken(token)
+                .setSource(source)
+                .setTimestamp(timestamp)
+                .setTriggerName(triggerName);
+        return MAPPER.convertValue(metadata, JsonNode.class);
+    }
+
+    private JsonNode metadataWithCustomAttributes() {
+        final ObjectNode customAttributes = MAPPER.createObjectNode()
+                .put("component", "xxx")
+                .put("subcomponent", "xxx");
+
+        return ((ObjectNode)metadata()).set("custom_attributes", customAttributes);
+    }
+
+    private JsonNode metadata(String token, String source, Long timestamp, String triggerName) {
+        return metadata(null, token, source, timestamp, triggerName);
+    }
+
+    private JsonNode metadata(String source, Long timestamp, String triggerName) {
+        return metadata(null, null, source, timestamp, triggerName);
+    }
+
+    private JsonNode metadata(Long timestamp, String triggerName) {
+        return metadata(null, null, null, timestamp, triggerName);
+    }
+
+    private JsonNode metadata(String source, String triggerName) {
+        return metadata(null, null, source, null, triggerName);
+    }
+
+    private JsonNode metadata(String source, Long timestamp) {
+        return metadata(null, null, source, timestamp, null);
+    }
+
+    private JsonNode metadata(String token) {
+        return metadata("admin", token, "asource", 0L, " ");
+    }
+
+    private JsonNode metadata() {
+        return metadata("token-ok");
+    }
 
     @AfterClass
     public static void cleanup() {
@@ -101,7 +186,7 @@ public class ApiControllerTests {
 
     @Test
     public void idMissingTest() throws Exception {
-        String eventWithoutAuth = "{\"payload\":{},\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"payload\":{},\"metadata\":" + metadata("asource", 0L, "atrigger") + "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
@@ -115,86 +200,110 @@ public class ApiControllerTests {
 
     @Test
     public void payloadMissingTests() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"metadata\":" + metadata("asource", 0L, "atrigger") + "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void metadataSourceMissingTest() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":{\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata(0L, "atrigger") +
+                "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void metadataTimestampMissingTest() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":{\"source\":\"xxx\"}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("asource", "atrigger") +
+                "}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void metadataTriggerMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("asource", 0L) +
+                "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void apiControllerNotAuthenticatedBothUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
+                metadata("asource", 0L, "atrigger") + "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerNotAuthenticatedTokenUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
+                metadata("admin", null, "asource", 0L, "atrigger") +
+                "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerNotAuthenticatedProjectUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"token\":\"token-ok\",\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
+                metadata("token-ok", "asource", 0L, "atrigger") +
+                "}";
         mockMvc.perform(post("/api").content(eventWithoutAuth)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerAuthenticationOk() throws Exception {
-        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"token\":\"token-ok\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("token-ok") + "}";
         mockMvc.perform(post("/api").content(eventWithAuthOK)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void apiControllerAuthenticationFail() throws Exception {
-        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"token\":\"wrong-token\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("wrong-token") + "}";
         mockMvc.perform(post("/api").content(eventWithAuthFail)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void apiControllerKeystoneError() throws Exception {
-        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"token\":\"force-error\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0}}";
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("force-error") + "}";
         mockMvc.perform(post("/api").content(eventWithAuthFail)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void customAttributesTest() throws Exception {
-        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{}," +
-                "\"metadata\":{" +
-                    "\"token\":\"token-ok\",\"project\":\"admin\",\"source\":\"xxx\",\"timestamp\":0," +
-                    "\"custom_attributes\":{" +
-                        "\"component\":\"xxx\",\"subcomponent\":\"xxx\"}}}";
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
         mockMvc.perform(post("/api").content(eventWithAuthOK)
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
+
+    @Test
+    public void customAttributesWithListenerTest() throws Exception {
+        final String queueName = QUEUE_TRIGGER_PREFIX + "atrigger";
+        amqpService.newQueue(queueName);
+        amqpService.prepareListenersMap(queueName);
+        amqpService.registerListener(queueName, message -> System.out.println(new String(message.getBody())));
+
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
+        mockMvc.perform(post("/api").content(eventWithAuthOK)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+    }
+
+    @Test
+    public void customAttributesWithListener2Test() throws Exception {
+        final String queueName = QUEUE_TRIGGER_PREFIX + "atrigger";
+        amqpService.newQueue(queueName);
+        amqpService.prepareListenersMap(queueName);
+
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
+        mockMvc.perform(post("/api").content(eventWithAuthOK)
+                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+    }
+
 }
