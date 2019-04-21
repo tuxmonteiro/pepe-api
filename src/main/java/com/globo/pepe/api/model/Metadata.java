@@ -31,6 +31,9 @@ public class Metadata {
 
     private Long timestamp;
 
+    @JsonProperty("trigger_name")
+    private String triggerName;
+
     @JsonProperty("custom_attributes")
     private JsonNode customAttributes;
 
@@ -67,6 +70,15 @@ public class Metadata {
 
     public Metadata setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+        return this;
+    }
+
+    public String getTriggerName() {
+        return triggerName;
+    }
+
+    public Metadata setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
         return this;
     }
 
