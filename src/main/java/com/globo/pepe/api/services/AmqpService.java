@@ -16,6 +16,8 @@
 
 package com.globo.pepe.api.services;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -32,6 +34,7 @@ import java.util.Map;
 @Component
 public class AmqpService {
 
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final RabbitTemplate template;
     private final RabbitAdmin admin;
@@ -51,30 +54,48 @@ public class AmqpService {
     }
 
     public void convertAndSend(String queue, String message) {
+        newQueue(queue);
         template.convertAndSend(queue, message);
     }
 
-    public String newQueue(String queueName) {
+    public boolean exist(String queueName) {
+        try {
+            final String queueNameProd = (String) admin.getQueueProperties(queueName).get(RabbitAdmin.QUEUE_NAME);
+            return queueNameProd != null;
+        } catch (Exception ignore) {
+            // ignored
+        }
+        return false;
+    }
+
+    public boolean newQueue(String queueName) throws RuntimeException {
+        messageListeners.computeIfAbsent(queueName, q -> new ArrayList<>());
+        if (exist(queueName)) {
+            return false;
+        }
         final Queue queue = new Queue(queueName);
-        final String declaredQueue = admin.declareQueue(queue);
-        startListeners(queueName);
-        return declaredQueue;
+        LOGGER.info("Queue " + queueName + " created.");
+        return admin.declareQueue(queue) != null;
     }
 
     private MessageListener messageListener(String queueName) {
         return message -> {
+            if (messageListeners.get(queueName).isEmpty()) {
+                LOGGER.warn("Discarding queue message: " + message + ". Queue " + queueName + " dont have listeners registered.");
+            }
             for (MessageListener messageListener: messageListeners.get(queueName)) {
                 messageListener.onMessage(message);
             }
         };
     }
 
-    private void startListeners(String queueName) {
+    public void prepareListenersMap(String queueName) {
         final SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addQueueNames(queueName);
-        messageListeners.put(queueName, new ArrayList<>());
-        container.setMessageListener(messageListener(queueName));
+        container.setAutoStartup(true);
+        container.setAmqpAdmin(admin);
+        container.initialize();
         container.start();
         messageListenerContainerMap.put(queueName, container);
     }
@@ -91,6 +112,10 @@ public class AmqpService {
     }
 
     public void registerListener(String queueName, MessageListener newMessageListener) {
+        if (messageListeners.get(queueName).isEmpty()) {
+            final SimpleMessageListenerContainer container = messageListenerContainerMap.get(queueName);
+            container.setMessageListener(messageListener(queueName));
+        }
         final List<MessageListener> listOfMessageListener = messageListeners.get(queueName);
         listOfMessageListener.add(newMessageListener);
         messageListeners.put(queueName, listOfMessageListener);
