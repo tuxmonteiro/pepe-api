@@ -53,8 +53,11 @@ public class AmqpService {
         return connectionFactory;
     }
 
-    public void convertAndSend(String queue, String message) {
-        template.convertAndSend(queue, message);
+    public void convertAndSend(String queue, String message, long ttl) {
+        template.convertAndSend(queue, message, m -> {
+            m.getMessageProperties().setExpiration(String.valueOf(ttl));
+            return m;
+        });
     }
 
     public boolean exist(String queueName) {

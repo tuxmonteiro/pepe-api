@@ -66,7 +66,7 @@ public class ChapolinService {
         }
 
         public Event send() {
-            amqpService.convertAndSend(queueTriggerName, mapper.convertValue(event, JsonNode.class).toString());
+            amqpService.convertAndSend(queueTriggerName, mapper.convertValue(event, JsonNode.class).toString(), 10000);
             return event;
         }
 

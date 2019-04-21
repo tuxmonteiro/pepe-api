@@ -59,7 +59,7 @@ public class AmqpServiceTests {
             latch.countDown();
         });
 
-        amqpService.convertAndSend(queueName, originalMessage);
+        amqpService.convertAndSend(queueName, originalMessage, 10000);
         assertTrue(latch.await(5, TimeUnit.SECONDS));
         amqpService.stopListener(queueName);
     }
