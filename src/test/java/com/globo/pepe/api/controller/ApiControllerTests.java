@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFactory;
 import com.globo.pepe.api.model.Metadata;
 import com.globo.pepe.api.services.AmqpService;
+import com.globo.pepe.api.services.ChapolinService;
 import com.globo.pepe.api.services.KeystoneService;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
@@ -31,14 +32,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,7 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import static com.globo.pepe.api.controller.ApiController.QUEUE_TRIGGER_PREFIX;
+import static com.globo.pepe.api.services.ChapolinService.QUEUE_TRIGGER_PREFIX;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -58,7 +55,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({ApiController.class, KeystoneService.class, AmqpService.class})
+@WebMvcTest({ApiController.class, KeystoneService.class, ChapolinService.class, AmqpService.class})
 @TestPropertySource(properties = {
         "keystone.url=http://127.0.0.1:5000/v3",
         "keystone.domain=default"
@@ -291,8 +288,11 @@ public class ApiControllerTests {
         amqpService.registerListener(queueName, message -> System.out.println(new String(message.getBody())));
 
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
-        mockMvc.perform(post("/api").content(eventWithAuthOK)
-                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+        int numEvents = 10;
+        for (int i=0; i<numEvents; i++) {
+            mockMvc.perform(post("/api").content(eventWithAuthOK)
+                    .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+        }
     }
 
     @Test
@@ -302,8 +302,11 @@ public class ApiControllerTests {
         amqpService.prepareListenersMap(queueName);
 
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
-        mockMvc.perform(post("/api").content(eventWithAuthOK)
-                .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+        int numEvents = 10;
+        for (int i=0; i<numEvents; i++) {
+            mockMvc.perform(post("/api").content(eventWithAuthOK)
+                    .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+        }
     }
 
 }

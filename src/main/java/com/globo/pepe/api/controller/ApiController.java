@@ -18,10 +18,9 @@ package com.globo.pepe.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.globo.pepe.api.model.Event;
 import com.globo.pepe.api.model.Metadata;
-import com.globo.pepe.api.services.AmqpService;
+import com.globo.pepe.api.services.ChapolinService;
 import com.globo.pepe.api.services.KeystoneService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.time.Instant;
 import java.util.Optional;
 
 import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
@@ -43,17 +41,15 @@ public class ApiController {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String QUEUE_TRIGGER_PREFIX = "pepe.trigger.";
-
     private final KeystoneService keystoneService;
-    private final AmqpService amqpService;
+    private final ChapolinService chapolinService;
     private final ObjectMapper mapper;
 
     public ApiController(KeystoneService keystoneService,
-                         AmqpService amqpService,
+                         ChapolinService chapolinService,
                          ObjectMapper mapper) {
         this.keystoneService = keystoneService;
-        this.amqpService = amqpService;
+        this.chapolinService = chapolinService;
         this.mapper = mapper;
     }
 
@@ -73,12 +69,9 @@ public class ApiController {
                 throwIfNull(metadata.getTimestamp(), new RuntimeException("metadata.timestamp NOT FOUND"));
                 throwIfNull(metadata.getTriggerName(), new RuntimeException("metadata.trigger_name NOT FOUND"));
 
-                defineCustomAttributes(metadata);
-
-                String queueName = QUEUE_TRIGGER_PREFIX + metadata.getTriggerName();
-                amqpService.convertAndSend(queueName, mapper.convertValue(event, JsonNode.class).toString());
-
-                return ResponseEntity.created(URI.create("/api")).body(mapper.valueToTree(event));
+                chapolinService.eventInstance(event).prepareQueueAndTrigger().defineCustomAttributes().send();
+                final JsonNode resultBody = mapper.valueToTree(event);
+                return ResponseEntity.created(URI.create("/api")).body(resultBody);
             }
         } catch (RuntimeException e) {
             LOGGER.error(e.getMessage() + ": " + body, e);
@@ -86,15 +79,6 @@ public class ApiController {
         }
 
         return ResponseEntity.status(401).body(mapper.createObjectNode());
-    }
-
-    private void defineCustomAttributes(final Metadata metadata) {
-        String queueName = QUEUE_TRIGGER_PREFIX + metadata.getTriggerName();
-        final JsonNode customAttributes = Optional.ofNullable(metadata.getCustomAttributes()).orElse(mapper.createObjectNode());
-        ((ObjectNode)customAttributes)
-                .put("received_at", Instant.now().toString())
-                .put("trigger", queueName);
-        metadata.setCustomAttributes(customAttributes);
     }
 
 }

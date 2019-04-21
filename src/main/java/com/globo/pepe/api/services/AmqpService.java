@@ -54,7 +54,6 @@ public class AmqpService {
     }
 
     public void convertAndSend(String queue, String message) {
-        newQueue(queue);
         template.convertAndSend(queue, message);
     }
 
