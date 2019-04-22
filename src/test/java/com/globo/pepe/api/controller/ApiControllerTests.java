@@ -24,6 +24,7 @@ import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFacto
 import com.globo.pepe.api.model.Metadata;
 import com.globo.pepe.api.services.AmqpService;
 import com.globo.pepe.api.services.ChapolinService;
+import com.globo.pepe.api.services.JsonLoggerService;
 import com.globo.pepe.api.services.KeystoneService;
 import org.apache.commons.io.IOUtils;
 import org.junit.AfterClass;
@@ -55,10 +56,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({ApiController.class, KeystoneService.class, ChapolinService.class, AmqpService.class})
+@WebMvcTest({ApiController.class, KeystoneService.class, ChapolinService.class, AmqpService.class, JsonLoggerService.class})
 @TestPropertySource(properties = {
         "keystone.url=http://127.0.0.1:5000/v3",
-        "keystone.domain=default"
+        "keystone.domain=default",
+        "pepe.logging.tags=default"
 })
 public class ApiControllerTests {
 
