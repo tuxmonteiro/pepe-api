@@ -58,6 +58,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
+        <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
 
     <dependencies>
@@ -131,6 +132,11 @@
             <artifactId>rabbitmq-mock</artifactId>
             <version>1.0.10</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
         </dependency>
     </dependencies>
 
