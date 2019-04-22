@@ -16,41 +16,40 @@
 
 package com.globo.pepe.api.controller;
 
+import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.globo.pepe.api.model.Event;
 import com.globo.pepe.api.model.Metadata;
 import com.globo.pepe.api.services.ChapolinService;
+import com.globo.pepe.api.services.JsonLoggerService;
+import com.globo.pepe.api.services.JsonLoggerService.JsonLogger;
 import com.globo.pepe.api.services.KeystoneService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.net.URI;
+import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.Optional;
-
-import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
-
 @SuppressWarnings("unused")
 @RestController
 public class ApiController {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private final KeystoneService keystoneService;
     private final ChapolinService chapolinService;
     private final ObjectMapper mapper;
+    private final JsonLogger logger;
 
     public ApiController(KeystoneService keystoneService,
-                         ChapolinService chapolinService,
-                         ObjectMapper mapper) {
+        ChapolinService chapolinService,
+        ObjectMapper mapper, JsonLoggerService jsonLoggerService) {
         this.keystoneService = keystoneService;
         this.chapolinService = chapolinService;
         this.mapper = mapper;
+        this.logger = jsonLoggerService.instance(getClass());
     }
 
     @PostMapping(name = "/api", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +73,7 @@ public class ApiController {
                 return ResponseEntity.created(URI.create("/api")).body(resultBody);
             }
         } catch (RuntimeException e) {
-            LOGGER.error(e.getMessage() + ": " + body, e);
+            logger.put("message", e.getMessage() + ": " + body).sendError(e);
             return ResponseEntity.status(400).body(mapper.createObjectNode());
         }
 
