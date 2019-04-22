@@ -17,6 +17,7 @@
 package com.globo.pepe.api.services;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.globo.pepe.api.mocks.AmqpMockConfiguration;
 import org.junit.Test;
@@ -36,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = {AmqpService.class, AmqpMockConfiguration.class}, loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {AmqpService.class, AmqpMockConfiguration.class, JsonLoggerService.class, ObjectMapper.class}, loader = AnnotationConfigContextLoader.class)
 public class AmqpServiceTests {
 
     @Autowired

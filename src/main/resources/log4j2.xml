@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019 - Globo.com - ATeam
+  ~ All rights reserved.
+  ~
+  ~ This source is subject to the Apache License, Version 2.0.
+  ~ Please see the LICENSE file for more information.
+  ~
+  ~ Authors: See AUTHORS file
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<Configuration status="WARN">
+  <Properties>
+    <Property name="LOGLEVEL">INFO</Property>
+    <Property name="HOSTNAME">localhost</Property>
+    <Property name="SYSLOG_HOST">localhost</Property>
+    <Property name="SYSLOG_PORT">514</Property>
+    <Property name="hostname">${env:HOSTNAME}</Property>
+    <Property name="syslog_host">${env:SYSLOG_HOST}</Property>
+    <Property name="syslog_port">${env:SYSLOG_PORT}</Property>
+  </Properties>
+  <Appenders>
+    <Socket name="SyslogApp" host="${syslog_host}" port="${syslog_port}" protocol="UDP">
+      <PatternLayout pattern="%m %exception%n"/>
+    </Socket>
+    <Async name="AsyncSyslogApp">
+      <AppenderRef ref="SyslogApp"/>
+    </Async>
+  </Appenders>
+  <Loggers>
+    <Root level="trace">
+      <AppenderRef ref="AsyncSyslogApp" level="${env:LOGLEVEL}"/>
+    </Root>
+  </Loggers>
+</Configuration>

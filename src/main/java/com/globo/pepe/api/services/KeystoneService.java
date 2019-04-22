@@ -18,8 +18,7 @@ package com.globo.pepe.api.services;
 
 import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.globo.pepe.api.services.JsonLoggerService.JsonLogger;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.common.Identifier;
@@ -33,12 +32,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class KeystoneService {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     @Value("${keystone.url}") String keystoneUrl;
     @Value("${keystone.domain}") String keystoneDomainContext;
 
+    private final JsonLogger logger;
+
     private boolean ignore = false;
+
+    public KeystoneService(JsonLoggerService jsonLoggerService) {
+        this.logger = jsonLoggerService.newLogger(getClass());
+    }
 
     public KeystoneService ignore(boolean ignore) {
         this.ignore = ignore;
@@ -50,7 +53,7 @@ public class KeystoneService {
         try {
             return userExist(project, token);
         } catch (RuntimeException e) {
-            LOGGER.error(e.getMessage());
+            logger.sendError(e);
         }
         return false;
     }

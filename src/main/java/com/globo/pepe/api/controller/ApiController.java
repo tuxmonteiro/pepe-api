@@ -49,7 +49,7 @@ public class ApiController {
         this.keystoneService = keystoneService;
         this.chapolinService = chapolinService;
         this.mapper = mapper;
-        this.logger = jsonLoggerService.instance(getClass());
+        this.logger = jsonLoggerService.newLogger(getClass());
     }
 
     @PostMapping(name = "/api", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -37,7 +37,7 @@ public class JsonLoggerService {
         this.mapper = mapper;
     }
 
-    public JsonLogger instance(Class<?> klazz) {
+    public JsonLogger newLogger(Class<?> klazz) {
         return new JsonLogger(klazz);
     }
 
@@ -54,13 +54,9 @@ public class JsonLoggerService {
             node.put("timestamp", Instant.now().getEpochSecond());
         }
 
-        private void processThrowwable(Throwable throwable) {
-            node.put("throwableMessage", throwable.getMessage());
-            try {
-                node.set("throwable_stack", mapper.convertValue(throwable, JsonNode.class));
-            } catch (IllegalArgumentException e) {
-                logger.error(e.getMessage(), e);
-            }
+        private void processThrowable(Throwable throwable) {
+            node.put("throwable_message", throwable.getMessage());
+            node.set("throwable_stack", mapper.convertValue(throwable, JsonNode.class));
         }
 
         public JsonLogger put(String key, String value) {
@@ -68,44 +64,55 @@ public class JsonLoggerService {
             return this;
         }
 
-        public void sendDebug() {
+        public String sendDebug() {
             if (logger.isDebugEnabled()) {
-                logger.debug(node.toString());
+                String jsonStr = node.toString();
+                logger.debug(jsonStr);
+                return jsonStr;
             }
+            return null;
         }
 
-        public void sendDebug(Throwable throwable) {
+        public String sendDebug(Throwable throwable) {
             if (logger.isDebugEnabled()) {
-                processThrowwable(throwable);
-                sendDebug();
+                processThrowable(throwable);
+                return sendDebug();
             }
+            return null;
         }
 
-        public void sendInfo() {
-            logger.info(node.toString());
+        public String sendInfo() {
+            String jsonStr = node.toString();
+            logger.info(jsonStr);
+            return jsonStr;
         }
 
-        public void sendInfo(Throwable throwable) {
-            processThrowwable(throwable);
-            sendInfo();
+        public String sendInfo(Throwable throwable) {
+            processThrowable(throwable);
+            return sendInfo();
         }
 
-        public void sendWarn() {
-            logger.warn(node.toString());
+        public String sendWarn() {
+            String jsonStr = node.toString();
+            logger.warn(jsonStr);
+            return jsonStr;
+
         }
 
-        public void sendWarn(Throwable throwable) {
-            processThrowwable(throwable);
-            sendWarn();
+        public String sendWarn(Throwable throwable) {
+            processThrowable(throwable);
+            return sendWarn();
         }
 
-        public void sendError() {
-            logger.error(node.toString());
+        public String sendError() {
+            String jsonStr = node.toString();
+            logger.error(jsonStr);
+            return jsonStr;
         }
 
-        public void sendError(Throwable throwable) {
-            processThrowwable(throwable);
-            sendError();
+        public String sendError(Throwable throwable) {
+            processThrowable(throwable);
+            return sendError();
         }
     }
 }

@@ -16,8 +16,7 @@
 
 package com.globo.pepe.api.services;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.globo.pepe.api.services.JsonLoggerService.JsonLogger;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -34,19 +33,20 @@ import java.util.Map;
 @Component
 public class AmqpService {
 
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private final RabbitTemplate template;
     private final RabbitAdmin admin;
     private final ConnectionFactory connectionFactory;
+    private final JsonLogger logger;
 
     private final Map<String, SimpleMessageListenerContainer> messageListenerContainerMap = new HashMap<>();
     private final Map<String, List<MessageListener>> messageListeners = new HashMap<>();
 
-    public AmqpService(ConnectionFactory connectionFactory, RabbitTemplate template, RabbitAdmin admin) {
+    public AmqpService(ConnectionFactory connectionFactory, RabbitTemplate template, RabbitAdmin admin,
+        JsonLoggerService jsonLoggerService) {
         this.connectionFactory = connectionFactory;
         this.template = template;
         this.admin = admin;
+        this.logger = jsonLoggerService.newLogger(getClass());
     }
 
     public ConnectionFactory connectionFactory() {
@@ -76,14 +76,14 @@ public class AmqpService {
             return false;
         }
         final Queue queue = new Queue(queueName);
-        LOGGER.info("Queue " + queueName + " created.");
+        logger.put("message", "Queue " + queueName + " created.").sendInfo();
         return admin.declareQueue(queue) != null;
     }
 
     private MessageListener messageListener(String queueName) {
         return message -> {
             if (messageListeners.get(queueName).isEmpty()) {
-                LOGGER.warn("Discarding queue message: " + message + ". Queue " + queueName + " dont have listeners registered.");
+                logger.put("message", "Discarding queue message: " + message + ". Queue " + queueName + " dont have listeners registered.").sendWarn();
             }
             for (MessageListener messageListener: messageListeners.get(queueName)) {
                 messageListener.onMessage(message);

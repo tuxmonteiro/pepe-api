@@ -56,7 +56,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({ApiController.class, KeystoneService.class, ChapolinService.class, AmqpService.class, JsonLoggerService.class})
+@WebMvcTest({ApiController.class, KeystoneService.class, ChapolinService.class, AmqpService.class, JsonLoggerService.class, ObjectMapper.class})
 @TestPropertySource(properties = {
         "keystone.url=http://127.0.0.1:5000/v3",
         "keystone.domain=default",
