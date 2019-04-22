@@ -1,3 +1,8 @@
+build:
+  project: '@project.artifactId@'
+  timestamp: '@timestamp@'
+  version: '@project.version@'
+
 keystone:
   url: http://127.0.0.1:5000/v3
   domain: default
