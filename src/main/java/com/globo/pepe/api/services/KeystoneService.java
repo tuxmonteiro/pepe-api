@@ -34,22 +34,16 @@ public class KeystoneService {
 
     @Value("${keystone.url}") String keystoneUrl;
     @Value("${keystone.domain}") String keystoneDomainContext;
+    @Value("${pepe.security.disabled}") Boolean securityDisabled;
 
     private final JsonLogger logger;
-
-    private boolean ignore = false;
 
     public KeystoneService(JsonLoggerService jsonLoggerService) {
         this.logger = jsonLoggerService.newLogger(getClass());
     }
 
-    public KeystoneService ignore(boolean ignore) {
-        this.ignore = ignore;
-        return this;
-    }
-
     public boolean isValid(String project, String token) {
-        if (ignore) return true;
+        if (securityDisabled && (token.isEmpty() || project.isEmpty())) return true;
         try {
             return userExist(project, token);
         } catch (RuntimeException e) {

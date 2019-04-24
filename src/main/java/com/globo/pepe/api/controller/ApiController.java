@@ -63,7 +63,7 @@ public class ApiController {
 
             final String project = Optional.ofNullable(metadata.getProject()).orElse("");
             final String token = Optional.ofNullable(metadata.getToken()).orElse("");
-            if (keystoneService.ignore(token.isEmpty() || project.isEmpty()).isValid(project, token)) {
+            if (keystoneService.isValid(project, token)) {
                 throwIfNull(metadata.getSource(), new RuntimeException("metadata.source NOT FOUND"));
                 throwIfNull(metadata.getTimestamp(), new RuntimeException("metadata.timestamp NOT FOUND"));
                 throwIfNull(metadata.getTriggerName(), new RuntimeException("metadata.trigger_name NOT FOUND"));
