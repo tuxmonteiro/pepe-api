@@ -7,6 +7,12 @@ keystone:
   url: http://127.0.0.1:5000/v3
   domain: default
 
+pepe:
+  logging:
+    tags: default
+  security:
+    disabled: true
+
 amqp:
   url: amqp://guest:guest@127.0.0.1
 

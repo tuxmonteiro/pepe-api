@@ -10,6 +10,8 @@ keystone:
 pepe:
   logging:
     tags: ${LOGGING_TAGS:default}
+  security:
+    disabled: ${SECURITY_ENABLE:false}
 
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}

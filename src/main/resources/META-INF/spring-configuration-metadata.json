@@ -29,6 +29,17 @@
       "name": "build.timestamp",
       "type": "java.lang.String",
       "description": "Maven build.timestamp."
+    },
+    {
+      "name": "pepe.logging.tags",
+      "type": "java.lang.String",
+      "description": "Define logging tags (useful to Graylog)."
+    },
+    {
+      "name": "pepe.security.disabled",
+      "type": "java.lang.Boolean",
+      "description": "Disable token check if token and project is missing."
     }
+
   ]
 }
