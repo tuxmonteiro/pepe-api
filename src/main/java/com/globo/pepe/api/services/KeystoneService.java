@@ -43,7 +43,7 @@ public class KeystoneService {
     }
 
     public boolean isValid(String project, String token) {
-        if (securityDisabled && (token.isEmpty() || project.isEmpty())) return true;
+        if (securityDisabled) return true;
         try {
             return userExist(project, token);
         } catch (RuntimeException e) {

@@ -63,11 +63,12 @@ public class ApiController {
 
             final String project = Optional.ofNullable(metadata.getProject()).orElse("");
             final String token = Optional.ofNullable(metadata.getToken()).orElse("");
+            throwIfNull(metadata.getProject(), new RuntimeException("metadata.project NOT FOUND"));
+            throwIfNull(metadata.getToken(), new RuntimeException("metadata.token NOT FOUND"));
+            throwIfNull(metadata.getSource(), new RuntimeException("metadata.source NOT FOUND"));
+            throwIfNull(metadata.getTimestamp(), new RuntimeException("metadata.timestamp NOT FOUND"));
+            throwIfNull(metadata.getTriggerName(), new RuntimeException("metadata.trigger_name NOT FOUND"));
             if (keystoneService.isValid(project, token)) {
-                throwIfNull(metadata.getSource(), new RuntimeException("metadata.source NOT FOUND"));
-                throwIfNull(metadata.getTimestamp(), new RuntimeException("metadata.timestamp NOT FOUND"));
-                throwIfNull(metadata.getTriggerName(), new RuntimeException("metadata.trigger_name NOT FOUND"));
-
                 chapolinService.eventInstance(event).prepareQueueAndTrigger().defineCustomAttributes().send();
                 final JsonNode resultBody = mapper.valueToTree(event);
                 return ResponseEntity.created(URI.create("/api")).body(resultBody);

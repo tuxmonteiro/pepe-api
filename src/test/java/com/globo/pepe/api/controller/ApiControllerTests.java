@@ -20,6 +20,7 @@ import static com.globo.pepe.api.services.ChapolinService.QUEUE_TRIGGER_PREFIX;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -71,6 +72,9 @@ public class ApiControllerTests {
 
     @Autowired
     private AmqpService amqpService;
+
+    @Autowired
+    private KeystoneService keystoneService;
 
     private static ClientAndServer mockServer;
 
@@ -198,6 +202,24 @@ public class ApiControllerTests {
     }
 
     @Test
+    public void metadataProjectMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
+            metadata(null, "token-ok", "asource", 0L, "atrigger") +
+            "}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void metadataTokenMissingTest() throws Exception {
+        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
+            metadata("admin", null, "asource", 0L, "atrigger") +
+            "}";
+        mockMvc.perform(post("/api").content(eventWithoutAuth)
+            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void metadataSourceMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata(0L, "atrigger") +
                 "}";
@@ -222,29 +244,12 @@ public class ApiControllerTests {
     }
 
     @Test
-    public void apiControllerNotAuthenticatedBothUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
-                metadata("asource", 0L, "atrigger") + "}";
-        mockMvc.perform(post("/api").content(eventWithoutAuth)
+    public void apiControllerNotAuthenticationTest() throws Exception {
+        setField(keystoneService, "securityDisabled", true);
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("token-ok") + "}";
+        mockMvc.perform(post("/api").content(eventWithAuthOK)
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
-    }
-
-    @Test
-    public void apiControllerNotAuthenticatedTokenUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
-                metadata("admin", null, "asource", 0L, "atrigger") +
-                "}";
-        mockMvc.perform(post("/api").content(eventWithoutAuth)
-            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
-    }
-
-    @Test
-    public void apiControllerNotAuthenticatedProjectUndef() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
-                metadata("token-ok", "asource", 0L, "atrigger") +
-                "}";
-        mockMvc.perform(post("/api").content(eventWithoutAuth)
-            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
+        setField(keystoneService, "securityDisabled", false);
     }
 
     @Test

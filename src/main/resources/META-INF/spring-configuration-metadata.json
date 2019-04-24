@@ -38,7 +38,7 @@
     {
       "name": "pepe.security.disabled",
       "type": "java.lang.Boolean",
-      "description": "Disable token check if token and project is missing."
+      "description": "Disable keystone token check."
     }
 
   ]
