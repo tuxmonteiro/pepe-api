@@ -23,22 +23,22 @@
 #             script's ability to control the application.
 
 # SO adjust
-[ -x "/opt/pepe-api/scripts/sysctl.sh" ] && sudo /opt/pepe-api/scripts/sysctl.sh > /dev/null 2>&1 || true
+[ -x "/opt/pepe/api/scripts/sysctl.sh" ] && sudo /opt/pepe/api/scripts/sysctl.sh > /dev/null 2>&1 || true
 
 # Application
 APP_NAME="pepe-api"
 APP_LONG_NAME="pepe-api"
 
 # Wrapper
-WRAPPER_CMD="/opt/pepe-api/lib/wrapper/bin/wrapper"
-WRAPPER_CONF="/opt/pepe-api/conf/wrapper.conf"
+WRAPPER_CMD="/opt/pepe/api/lib/wrapper/bin/wrapper"
+WRAPPER_CONF="/opt/pepe/api/conf/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="/opt/logs/pepe-api"
+PIDDIR="/opt/logs/pepe/api"
 
 # PIDFILE_CHECK_PID tells the script to double check whether the pid in the pid
 #  file actually exists and belongs to this application.  When not set, only

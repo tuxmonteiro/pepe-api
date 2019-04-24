@@ -1,6 +1,7 @@
 RPM_VER=$(PEPE_VERSION)
 VERSION=${RPM_VER}
 RELEASE=$(shell date +%y%m%d%H%M)
+SERVICE=api
 
 deploy-snapshot:
 	./mvnw clean install -DskipTests deploy:deploy -DaltDeploymentRepository=oss-jfrog::default::http://oss.jfrog.org/artifactory/oss-snapshot-local
@@ -41,7 +42,7 @@ dist: api
         --vendor 'Globo.com' \
         --description "Pepe api service" \
         --after-install scripts/postinstall \
-        -f -p ../dists/pepe-api-${RPM_VER}.el7.noarch.rpm lib/=/opt/pepe/lib/ scripts/=/opt/pepe/scripts/ conf/=/opt/pepe/conf/ initscript=/etc/init.d/pepe && \
+        -f -p ../dists/pepe-api-${RPM_VER}.el7.noarch.rpm lib/=/opt/pepe/${SERVICE}/lib/ scripts/=/opt/pepe/${SERVICE}/scripts/ conf/=/opt/pepe/${SERVICE}/conf/ initscript=/etc/init.d/pepe-${SERVICE} && \
     cd $$old
 
 doc:
