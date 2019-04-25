@@ -9,7 +9,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = {
-    "pepe.logging.tags=default"
+    "pepe.logging.tags=default",
+    "spring.pid.file=/tmp/pepe.pid"
 })
 public class ApplicationTests {
 
