@@ -23,3 +23,6 @@ spring:
       spec: maximumSize=500, expireAfterAccess=60s
   pid:
     file: ${PID_FILE:/tmp/pepe-api.pid}
+
+server:
+  port: ${PORT:8000}
