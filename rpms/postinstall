@@ -1,0 +1,9 @@
+#!/bin/bash
+
+SERVICE=api
+getent group pepe > /dev/null 2>&1 || groupadd -r pepe
+if getent group pepe > /dev/null 2>&1; then id pepe > /dev/null 2>&1 || useradd -M -r -g pepe -d /opt/pepe pepe;fi
+id pepe > /dev/null 2>&1 && /usr/bin/systemctl enable pepe@${SERVICE} || true
+test -d /opt/logs/pepe/${SERVICE} && chown -R pepe.pepe /opt/logs/pepe/${SERVICE}
+
+#EOF

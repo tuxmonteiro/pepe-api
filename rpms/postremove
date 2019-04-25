@@ -1,0 +1,13 @@
+$!/bin/bash
+
+SERVICE=api
+rm -f /etc/systemd/system/multi-user.target.wants/pepe@${SERVICE}.service || true
+rm -f /opt/logs/pepe/api/pepe.pid || true
+test "$(find /opt/pepe/${SERVICE} -type f | wc -l)" == "0" && rm -rf /opt/pepe/${SERVICE} || true
+test "$(find /opt/pepe -type f | wc -l)" == "0" && rm -rf /opt/pepe || true
+test "$(find /opt/logs/pepe/${SERVICE} -type f | wc -l)" == "0" && rm -rf /opt/logs/pepe/${SERVICE} || true
+test "$(find /opt/logs/pepe -type f | wc -l)" == "0" && rm -rf /opt/logs/pepe || true
+test "$(find /opt/logs -type f | wc -l)" == "0" && rm -rf /opt/logs || true
+userdel pepe || true
+
+#EOF

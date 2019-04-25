@@ -14,36 +14,34 @@ test:
 
 clean:
 	./mvnw clean
-	rm -f dists/pepe-api-${RPM_VER}*.rpm
+	rm -f dists/pepe-${SERVICE}-${RPM_VER}*.rpm
 
 dist: api
 	type fpm > /dev/null 2>&1 && \
-    old=$$(pwd) && \
-    cd target && \
-    mkdir -p lib conf && \
-    echo "#version ${VERSION}" > VERSION && \
-    git show --summary >> lib/VERSION && \
-    cp -av ../wrapper lib/ || true && \
-    cp -v ../wrapper.conf conf/ || true && \
-    cp -v ../log4j.xml conf/ || true && \
-    cp -av ../scripts . || true  && \
-    cp -av ../initscript . || true  && \
-    cp -v pepe-api-${VERSION}-SNAPSHOT.jar lib/pepe-api.jar && \
-    fpm -s dir \
-        --rpm-rpmbuild-define '_binaries_in_noarch_packages_terminate_build 0' \
-        -t rpm \
-        -n "pepe-api" \
-        -v ${RPM_VER} \
-        --iteration ${RELEASE}.el7 \
-        -a noarch \
-        --rpm-os linux \
-        -m 'A-Team <a-team@corp.globo.com>' \
-        --url 'https://pepeproject.github.com' \
-        --vendor 'Globo.com' \
-        --description "Pepe api service" \
-        --after-install scripts/postinstall \
-        -f -p ../dists/pepe-api-${RPM_VER}.el7.noarch.rpm lib/=/opt/pepe/${SERVICE}/lib/ scripts/=/opt/pepe/${SERVICE}/scripts/ conf/=/opt/pepe/${SERVICE}/conf/ initscript=/etc/init.d/pepe-${SERVICE} && \
-    cd $$old
+  echo "#version ${VERSION}" > target/VERSION && \
+  git show --summary >> target/VERSION && \
+  mkdir -p target/empty && \
+  fpm -s dir \
+      --rpm-rpmbuild-define '_binaries_in_noarch_packages_terminate_build 0' \
+      -t rpm \
+      -n "pepe-${SERVICE}" \
+      -v ${RPM_VER} \
+      --iteration ${RELEASE}.el7 \
+      -a noarch \
+      --rpm-os linux \
+      -m 'A-Team <a-team@corp.globo.com>' \
+      --url 'https://pepeproject.github.com' \
+      --vendor 'Globo.com' \
+      --description "Pepe ${SERVICE} service" \
+      --after-install rpms/postinstall \
+      --after-remove rpms/postremove \
+      -f -p ./dists/pepe-${SERVICE}-${RPM_VER}.el7.noarch.rpm \
+              rpms/pepe-profile.sh=/opt/pepe/${SERVICE}/scripts/pepe.sh \
+              rpms/pepe@.service=/usr/lib/systemd/system/pepe@.service \
+              rpms/log4j.xml=/opt/pepe/${SERVICE}/conf/log4j.xml \
+              target/VERSION=/opt/pepe/${SERVICE}/lib/VERSION \
+              target/empty/=/opt/logs/pepe/api \
+              target/pepe-${SERVICE}-${VERSION}-SNAPSHOT.jar=/opt/pepe/${SERVICE}/lib/pepe.jar
 
 doc:
 	cd docs && rm -rf html && doxygen Doxyfile

@@ -1,0 +1,40 @@
+[Unit]
+Description=Pepe %i
+After=syslog.target
+
+[Service]
+User=pepe
+Group=pepe
+WorkingDirectory=/opt/pepe/%i
+Environment="PID_FILE=/opt/logs/pepe/%i/pepe.pid"
+Environment="JAVA_VMS=-Xms1024m"
+Environment="JAVA_VMX=-Xmx1024m"
+ExecStart=/bin/bash -l -c "\
+  source /opt/pepe/%i/scripts/pepe.sh || true; \
+  /usr/bin/java \
+  -server \
+  -XX:+UseParallelGC \
+  -XX:+AggressiveOpts \
+  -XX:+PerfDisableSharedMem \
+  -Dcom.sun.management.jmxremote.port=9999 \
+  -Dcom.sun.management.jmxremote.authenticate=false \
+  -Dcom.sun.management.jmxremote.ssl=false \
+  -Dcom.sun.management.jmxremote=true \
+  -Dlogging.config=/opt/pepe/%i/conf/log4j.xml \
+  -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector \
+  ${JAVA_VMS} \
+  ${JAVA_VMX} \
+  -jar /opt/pepe/%i/lib/pepe.jar"
+ExecStop=kill $MAINPID; rm -f $PID_FILE
+GuessMainPID=no
+KillMode=mixed
+Restart=on-failure
+RestartSec=30s
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=pepe-%i
+PIDFile=/opt/logs/pepe/%i/pepe.pid
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
