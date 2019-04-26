@@ -21,7 +21,6 @@ import static com.globo.pepe.common.util.ComplianceChecker.throwIfNull;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.globo.pepe.common.services.JsonLoggerService;
-import com.globo.pepe.common.services.JsonLoggerService.JsonLogger;
 import com.globo.pepe.common.model.Event;
 import com.globo.pepe.common.model.Metadata;
 import com.globo.pepe.api.services.ChapolinService;
@@ -41,7 +40,7 @@ public class ApiController {
     private final KeystoneService keystoneService;
     private final ChapolinService chapolinService;
     private final ObjectMapper mapper;
-    private final JsonLogger logger;
+    private final JsonLoggerService jsonLoggerService;
 
     public ApiController(KeystoneService keystoneService,
         ChapolinService chapolinService,
@@ -49,7 +48,7 @@ public class ApiController {
         this.keystoneService = keystoneService;
         this.chapolinService = chapolinService;
         this.mapper = mapper;
-        this.logger = jsonLoggerService.newLogger(getClass());
+        this.jsonLoggerService = jsonLoggerService;
     }
 
     @PostMapping(name = "/api", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +73,7 @@ public class ApiController {
                 return ResponseEntity.created(URI.create("/api")).body(resultBody);
             }
         } catch (RuntimeException e) {
-            logger.put("message", e.getMessage() + ": " + body).sendError();
+            jsonLoggerService.newLogger(getClass()).put("short_message", e.getMessage() + ": " + body).sendError();
             return ResponseEntity.status(400).body(mapper.createObjectNode());
         }
 
