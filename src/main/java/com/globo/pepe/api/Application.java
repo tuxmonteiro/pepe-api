@@ -16,27 +16,14 @@
 
 package com.globo.pepe.api;
 
-import com.globo.pepe.api.services.KeystoneService;
-import com.globo.pepe.common.configuration.AmqpConfiguration;
-import com.globo.pepe.common.controller.HealthcheckController;
-import com.globo.pepe.common.controller.InfoController;
-import com.globo.pepe.common.services.AmqpService;
-import com.globo.pepe.common.services.JsonLoggerService;
+import com.globo.pepe.common.util.EnablePepeCommon;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Import;
 
 @EnableCaching
+@EnablePepeCommon
 @SpringBootApplication
-@Import({
-    AmqpConfiguration.class,
-    AmqpService.class,
-    KeystoneService.class,
-    JsonLoggerService.class,
-    HealthcheckController.class,
-    InfoController.class
-})
 public class Application {
 
 	public static void main(String[] args) {
