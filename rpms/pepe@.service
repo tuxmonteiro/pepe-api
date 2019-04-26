@@ -25,7 +25,7 @@ ExecStart=/bin/bash -l -c "\
   ${JAVA_VMS} \
   ${JAVA_VMX} \
   -jar /opt/pepe/%i/lib/pepe.jar"
-ExecStop=kill $MAINPID; rm -f $PID_FILE
+ExecStop=/bin/bash -c "/bin/kill ${MAINPID}; /bin/rm -f ${PID_FILE}"
 GuessMainPID=no
 KillMode=mixed
 Restart=on-failure
