@@ -16,15 +16,15 @@
 
 package com.globo.pepe.api.controller;
 
-import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
+import static com.globo.pepe.common.util.ComplianceChecker.throwIfNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.globo.pepe.api.model.Event;
-import com.globo.pepe.api.model.Metadata;
+import com.globo.pepe.common.services.JsonLoggerService;
+import com.globo.pepe.common.services.JsonLoggerService.JsonLogger;
+import com.globo.pepe.common.model.Event;
+import com.globo.pepe.common.model.Metadata;
 import com.globo.pepe.api.services.ChapolinService;
-import com.globo.pepe.api.services.JsonLoggerService;
-import com.globo.pepe.api.services.JsonLoggerService.JsonLogger;
 import com.globo.pepe.api.services.KeystoneService;
 import java.net.URI;
 import java.util.Optional;

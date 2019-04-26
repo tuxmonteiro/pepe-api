@@ -16,9 +16,10 @@
 
 package com.globo.pepe.api.services;
 
-import static com.globo.pepe.api.util.ComplianceChecker.throwIfNull;
+import static com.globo.pepe.common.util.ComplianceChecker.throwIfNull;
 
-import com.globo.pepe.api.services.JsonLoggerService.JsonLogger;
+import com.globo.pepe.common.services.JsonLoggerService;
+import com.globo.pepe.common.services.JsonLoggerService.JsonLogger;
 import org.openstack4j.api.OSClient.OSClientV3;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.common.Identifier;

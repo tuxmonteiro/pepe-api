@@ -19,8 +19,9 @@ package com.globo.pepe.api.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.globo.pepe.api.model.Event;
-import com.globo.pepe.api.model.Metadata;
+import com.globo.pepe.common.model.Event;
+import com.globo.pepe.common.model.Metadata;
+import com.globo.pepe.common.services.AmqpService;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

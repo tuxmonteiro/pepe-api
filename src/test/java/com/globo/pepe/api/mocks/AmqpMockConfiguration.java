@@ -17,7 +17,6 @@
 package com.globo.pepe.api.mocks;
 
 import com.github.fridujo.rabbitmq.mock.compatibility.MockConnectionFactoryFactory;
-import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -41,10 +40,5 @@ public class AmqpMockConfiguration {
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
-    }
-
-    @Bean
-    public AsyncRabbitTemplate asyncRabbitTemplate(RabbitTemplate rabbitTemplate) {
-        return new AsyncRabbitTemplate(rabbitTemplate);
     }
 }

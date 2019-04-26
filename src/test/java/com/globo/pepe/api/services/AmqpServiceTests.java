@@ -17,9 +17,16 @@
 package com.globo.pepe.api.services;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fridujo.rabbitmq.mock.MockConnectionFactory;
 import com.globo.pepe.api.mocks.AmqpMockConfiguration;
+import com.globo.pepe.common.services.AmqpService;
+import com.globo.pepe.common.services.JsonLoggerService;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
@@ -28,12 +35,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
