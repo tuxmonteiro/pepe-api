@@ -34,6 +34,7 @@ dist: api
       --vendor 'Globo.com' \
       --description "Pepe ${SERVICE} service" \
       --after-install rpms/postinstall \
+      --before-remove rpms/preremove \
       --after-remove rpms/postremove \
       -f -p ./dists/pepe-${SERVICE}-${RPM_VER}.el7.noarch.rpm \
               rpms/pepe-profile.sh=/opt/pepe/${SERVICE}/scripts/pepe.sh \
