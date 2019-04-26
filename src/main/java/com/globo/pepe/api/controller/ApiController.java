@@ -74,7 +74,7 @@ public class ApiController {
                 return ResponseEntity.created(URI.create("/api")).body(resultBody);
             }
         } catch (RuntimeException e) {
-            logger.put("message", e.getMessage() + ": " + body).sendError(e);
+            logger.put("message", e.getMessage() + ": " + body).sendError();
             return ResponseEntity.status(400).body(mapper.createObjectNode());
         }
 
