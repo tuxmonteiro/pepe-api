@@ -6,17 +6,17 @@ SERVICE=api
 deploy-snapshot:
 	./mvnw clean install -DskipTests deploy:deploy -DaltDeploymentRepository=oss-jfrog::default::http://oss.jfrog.org/artifactory/oss-snapshot-local
 
-api: clean
+package: clean
 	./mvnw package -DskipTests
 
-test:
+test: clean
 	./mvnw test
 
 clean:
 	./mvnw clean
 	rm -f dists/pepe-${SERVICE}-${RPM_VER}*.rpm
 
-dist: api
+dist: package
 	type fpm > /dev/null 2>&1 && \
   echo "#version ${VERSION}" > target/VERSION && \
   git show --summary >> target/VERSION && \
@@ -41,7 +41,7 @@ dist: api
               rpms/pepe@.service=/usr/lib/systemd/system/pepe@.service \
               rpms/log4j.xml=/opt/pepe/${SERVICE}/conf/log4j.xml \
               target/VERSION=/opt/pepe/${SERVICE}/lib/VERSION \
-              target/empty/=/opt/logs/pepe/api \
+              target/empty/=/opt/logs/pepe/${SERVICE} \
               target/pepe-${SERVICE}-${VERSION}-SNAPSHOT.jar=/opt/pepe/${SERVICE}/lib/pepe.jar
 
 doc:
