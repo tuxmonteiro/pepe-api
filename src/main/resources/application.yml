@@ -16,7 +16,7 @@ pepe:
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}
   management:
-    url: ${RABBIT_MANAGEMENT_URL:http://127.0.0.1:15672}
+    url: ${RABBIT_MANAGEMENT_URL:http://127.0.0.1:15672/api}
     login: ${RABBIT_MANAGEMENT_LOGIN:guest}
     password: ${RABBIT_MANAGEMENT_PASSWORD:guest}
 
