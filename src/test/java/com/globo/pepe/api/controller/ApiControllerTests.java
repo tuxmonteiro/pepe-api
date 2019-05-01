@@ -16,7 +16,7 @@
 
 package com.globo.pepe.api.controller;
 
-import static com.globo.pepe.api.services.ChapolinService.QUEUE_TRIGGER_PREFIX;
+import static com.globo.pepe.common.util.Constants.TRIGGER_PREFIX;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -282,7 +282,7 @@ public class ApiControllerTests {
 
     @Test
     public void customAttributesWithListenerTest() throws Exception {
-        final String queueName = QUEUE_TRIGGER_PREFIX + "atrigger";
+        final String queueName = TRIGGER_PREFIX + ".atrigger";
         amqpService.newQueue(queueName);
         amqpService.prepareListenersMap(queueName);
         amqpService.registerListener(queueName, message -> System.out.println(new String(message.getBody())));
@@ -297,7 +297,7 @@ public class ApiControllerTests {
 
     @Test
     public void customAttributesWithListener2Test() throws Exception {
-        final String queueName = QUEUE_TRIGGER_PREFIX + "atrigger";
+        final String queueName = TRIGGER_PREFIX + ".atrigger";
         amqpService.newQueue(queueName);
         amqpService.prepareListenersMap(queueName);
 

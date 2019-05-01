@@ -16,6 +16,8 @@
 
 package com.globo.pepe.api.services;
 
+import static com.globo.pepe.common.util.Constants.TRIGGER_PREFIX;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -30,8 +32,6 @@ import java.util.Optional;
 @Service
 public class ChapolinService {
 
-    public static final String QUEUE_TRIGGER_PREFIX = "pepe.trigger.";
-
     private final AmqpService amqpService;
     private final ObjectMapper mapper;
 
@@ -42,7 +42,7 @@ public class ChapolinService {
 
     public EventInstance eventInstance(final Event event) {
         Metadata metadata = event.getMetadata();
-        String queueTriggerName = QUEUE_TRIGGER_PREFIX + metadata.getTriggerName();
+        String queueTriggerName = TRIGGER_PREFIX + "." + metadata.getTriggerName();
         return new EventInstance(event, metadata, queueTriggerName);
     }
 
@@ -59,7 +59,7 @@ public class ChapolinService {
         }
 
         public EventInstance prepareQueueAndTrigger() {
-            String queueName = QUEUE_TRIGGER_PREFIX + metadata.getTriggerName();
+            String queueName = TRIGGER_PREFIX + "." + metadata.getTriggerName();
             amqpService.newQueue(queueName);
             //TODO: create trigger using command queue
 
