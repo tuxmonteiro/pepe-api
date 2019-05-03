@@ -17,6 +17,8 @@
 package com.globo.pepe.api.services;
 
 
+import static com.globo.pepe.common.util.Constants.PACK_NAME;
+import static com.globo.pepe.common.util.Constants.TRIGGER_PREFIX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -51,8 +53,8 @@ public class AmqpServiceTests {
 
     @Test
     public void convertAndSendTest() throws InterruptedException {
-        String queueName="test";
-        String originalMessage="message";
+        String queueName = PACK_NAME + "." + TRIGGER_PREFIX + "." + "test";
+        String originalMessage = "message";
         amqpService.newQueue(queueName);
         amqpService.prepareListenersMap(queueName);
         CountDownLatch latch = new CountDownLatch(1);

@@ -15,8 +15,11 @@ pepe:
 
 amqp:
   url: amqp://guest:guest@127.0.0.1
+  management:
+    url: http://127.0.0.1:15672/api
+    login: guest
+    password: guest
 
-spring:
   cache:
     cache-names: userids
     caffeine:
