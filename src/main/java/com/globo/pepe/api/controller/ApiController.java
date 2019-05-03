@@ -16,8 +16,6 @@
 
 package com.globo.pepe.api.controller;
 
-import static com.globo.pepe.common.util.ComplianceChecker.throwIfNull;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.globo.pepe.common.services.JsonLoggerService;
@@ -29,6 +27,7 @@ import java.net.URI;
 import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,29 +54,33 @@ public class ApiController {
     public ResponseEntity<JsonNode> post(@RequestBody JsonNode body) {
         try {
             final Event event = mapper.convertValue(body, Event.class);
-            throwIfNull(event.getId(), new RuntimeException("id NOT FOUND"));
-            final Metadata metadata;
-            throwIfNull(metadata = event.getMetadata(), new RuntimeException("metadata NOT FOUND"));
-            throwIfNull(event.getPayload(), new RuntimeException("payload NOT FOUND"));
-
+            final Metadata metadata = sanitizeAndExtractMetadata(event);
             final String project = Optional.ofNullable(metadata.getProject()).orElse("");
             final String token = Optional.ofNullable(metadata.getToken()).orElse("");
-            throwIfNull(metadata.getProject(), new RuntimeException("metadata.project NOT FOUND"));
-            throwIfNull(metadata.getToken(), new RuntimeException("metadata.token NOT FOUND"));
-            throwIfNull(metadata.getSource(), new RuntimeException("metadata.source NOT FOUND"));
-            throwIfNull(metadata.getTimestamp(), new RuntimeException("metadata.timestamp NOT FOUND"));
-            throwIfNull(metadata.getTriggerName(), new RuntimeException("metadata.trigger_name NOT FOUND"));
-            if (keystoneService.isValid(project, token)) {
-                chapolinService.eventInstance(event).prepareQueueAndTrigger().defineCustomAttributes().send();
+            if (keystoneService.authenticate(project, token)) {
+                chapolinService.from(event).send();
                 final JsonNode resultBody = mapper.valueToTree(event);
                 return ResponseEntity.created(URI.create("/api")).body(resultBody);
             }
         } catch (RuntimeException e) {
             jsonLoggerService.newLogger(getClass()).put("short_message", e.getMessage() + ": " + body).sendError();
-            return ResponseEntity.status(400).body(mapper.createObjectNode());
+            return ResponseEntity.status(400).body(mapper.createObjectNode().put("error", e.getMessage()));
         }
 
         return ResponseEntity.status(401).body(mapper.createObjectNode());
+    }
+
+    private Metadata sanitizeAndExtractMetadata(Event event) throws RuntimeException {
+        final Metadata metadata;
+        Assert.notNull(event.getId(), "id NOT FOUND");
+        Assert.notNull(metadata = event.getMetadata(), "metadata NOT FOUND");
+        Assert.notNull(event.getPayload(), "payload NOT FOUND");
+        Assert.notNull(metadata.getProject(), "metadata.project NOT FOUND");
+        Assert.notNull(metadata.getToken(), "metadata.token NOT FOUND");
+        Assert.notNull(metadata.getSource(), "metadata.source NOT FOUND");
+        Assert.notNull(metadata.getTimestamp(), "metadata.timestamp NOT FOUND");
+        Assert.notNull(metadata.getTriggerName(), "metadata.trigger_name NOT FOUND");
+        return metadata;
     }
 
 }
