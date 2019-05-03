@@ -16,6 +16,7 @@
 
 package com.globo.pepe.api.services;
 
+import static com.globo.pepe.common.util.Constants.PACK_NAME;
 import static com.globo.pepe.common.util.Constants.TRIGGER_PREFIX;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,34 +41,28 @@ public class ChapolinService {
         this.mapper = mapper;
     }
 
-    public EventInstance eventInstance(final Event event) {
+    public EventInstance from(final Event event) {
         Metadata metadata = event.getMetadata();
-        String queueTriggerName = TRIGGER_PREFIX + "." + metadata.getTriggerName();
-        return new EventInstance(event, metadata, queueTriggerName);
+        String queueName = PACK_NAME + "." + TRIGGER_PREFIX + "." + metadata.getTriggerName();
+        return new EventInstance(event, metadata, queueName);
     }
 
     public class EventInstance {
 
         private final Event event;
         private final Metadata metadata;
-        private final String queueTriggerName;
+        private final String queueName;
 
-        private EventInstance(Event event, Metadata metadata, String queueTriggerName) {
+        private EventInstance(Event event, Metadata metadata, String queueName) {
             this.event = event;
             this.metadata = metadata;
-            this.queueTriggerName = queueTriggerName;
-        }
-
-        public EventInstance prepareQueueAndTrigger() {
-            String queueName = TRIGGER_PREFIX + "." + metadata.getTriggerName();
-            amqpService.newQueue(queueName);
-            //TODO: create trigger using command queue
-
-            return this;
+            this.queueName = queueName;
         }
 
         public Event send() {
-            amqpService.convertAndSend(queueTriggerName, mapper.convertValue(event, JsonNode.class).toString(), 10000);
+            amqpService.newQueue(queueName);
+            defineCustomAttributes();
+            amqpService.convertAndSend(queueName, mapper.convertValue(event, JsonNode.class).toString(), 10000);
             return event;
         }
 
@@ -75,7 +70,7 @@ public class ChapolinService {
             final JsonNode customAttributes = Optional.ofNullable(metadata.getCustomAttributes()).orElse(mapper.createObjectNode());
             ((ObjectNode)customAttributes)
                     .put("received_at", Instant.now().toString())
-                    .put("trigger", queueTriggerName);
+                    .put("trigger", queueName);
             metadata.setCustomAttributes(customAttributes);
             return this;
         }
