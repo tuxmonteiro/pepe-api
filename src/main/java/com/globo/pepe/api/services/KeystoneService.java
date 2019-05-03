@@ -42,7 +42,7 @@ public class KeystoneService {
         this.jsonLoggerService = jsonLoggerService;
     }
 
-    public boolean isValid(String project, String token) {
+    public boolean authenticate(String project, String token) {
         if (securityDisabled) return true;
         try {
             return userExist(project, token);
@@ -56,7 +56,7 @@ public class KeystoneService {
         return new AuthenticationException("{\"error\":\"" + objName + " is null\"}", 401);
     }
 
-    private OSClientV3 authenticate(String project, String token) throws RuntimeException {
+    private OSClientV3 osv3Authenticate(String project, String token) throws RuntimeException {
         return OSFactory.builderV3()
             .endpoint(keystoneUrl)
             .token(token)
@@ -68,7 +68,7 @@ public class KeystoneService {
     public boolean userExist(String project, String token) throws RuntimeException {
         OSClientV3 osClientV3;
         Token tokenOSv3;
-        throwIfNull(osClientV3 = authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
+        throwIfNull(osClientV3 = osv3Authenticate(project, token), getAuthException(OSClientV3.class.getSimpleName()));
         throwIfNull(tokenOSv3 = osClientV3.getToken(), getAuthException(Token.class.getSimpleName()));
         throwIfNull(tokenOSv3.getUser(), getAuthException(User.class.getSimpleName()));
         return true;
