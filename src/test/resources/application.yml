@@ -12,6 +12,8 @@ pepe:
     tags: default
   security:
     disabled: false
+  event:
+    ttl: 10000
 
 amqp:
   url: amqp://guest:guest@127.0.0.1

@@ -39,6 +39,11 @@
       "name": "pepe.security.disabled",
       "type": "java.lang.Boolean",
       "description": "Disable keystone token check."
+    },
+    {
+      "name": "pepe.event.ttl",
+      "type": "java.lang.Long",
+      "description": "Event TTL"
     }
 
   ]

@@ -12,6 +12,8 @@ pepe:
     tags: ${LOGGING_TAGS:default}
   security:
     disabled: ${SECURITY_DISABLE:false}
+  event:
+    ttl: ${EVENT_TTL:10000}
 
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}

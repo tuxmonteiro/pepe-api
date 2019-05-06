@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.globo.pepe.common.model.Event;
 import com.globo.pepe.common.model.Metadata;
 import com.globo.pepe.common.services.AmqpService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -35,6 +36,9 @@ public class ChapolinService {
 
     private final AmqpService amqpService;
     private final ObjectMapper mapper;
+
+    @Value("${pepe.event.ttl}")
+    private Long eventTtl;
 
     public ChapolinService(AmqpService amqpService, ObjectMapper mapper) {
         this.amqpService = amqpService;
@@ -62,7 +66,7 @@ public class ChapolinService {
         public Event send() {
             amqpService.newQueue(queueName);
             defineCustomAttributes();
-            amqpService.convertAndSend(queueName, mapper.convertValue(event, JsonNode.class).toString(), 10000);
+            amqpService.convertAndSend(queueName, mapper.convertValue(event, JsonNode.class).toString(), eventTtl);
             return event;
         }
 
