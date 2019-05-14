@@ -286,7 +286,7 @@ public class ApiControllerTests {
         final String queueName = PACK_NAME + "." + TRIGGER_PREFIX + ".atrigger";
         amqpService.newQueue(queueName);
         amqpService.prepareListenersMap(queueName);
-        amqpService.registerListener(queueName, message -> System.out.println(new String(message.getBody())));
+        amqpService.registerListener(queueName, (message, channel) -> System.out.println(new String(message.getBody())));
 
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
         int numEvents = 10;

@@ -58,7 +58,7 @@ public class AmqpServiceTests {
         amqpService.newQueue(queueName);
         amqpService.prepareListenersMap(queueName);
         CountDownLatch latch = new CountDownLatch(1);
-        amqpService.registerListener(queueName, message -> {
+        amqpService.registerListener(queueName, (message, channel) -> {
             assertEquals("not original message", originalMessage, new String(message.getBody()));
             latch.countDown();
         });
