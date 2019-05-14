@@ -14,6 +14,9 @@ pepe:
     disabled: ${SECURITY_DISABLE:false}
   event:
     ttl: ${EVENT_TTL:10000}
+  stackstorm:
+    url: ${STACKSTORM_URL:http://127.0.0.0:9101/v1}
+    key: ${STACKSTORM_KEY:NOT_KEY}
 
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}
