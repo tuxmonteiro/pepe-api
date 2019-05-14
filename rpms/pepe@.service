@@ -16,6 +16,8 @@ ExecStart=/bin/bash -l -c "\
   -XX:+UseParallelGC \
   -XX:+AggressiveOpts \
   -XX:+PerfDisableSharedMem \
+  -Djavax.net.ssl.keyStore=/etc/pki/java/cacerts \
+  -Djavax.net.ssl.trustStore=/etc/pki/java/cacerts \
   -Dcom.sun.management.jmxremote.port=9999 \
   -Dcom.sun.management.jmxremote.authenticate=false \
   -Dcom.sun.management.jmxremote.ssl=false \
