@@ -60,7 +60,7 @@ public class KeystoneService {
         return OSFactory.builderV3()
             .endpoint(keystoneUrl)
             .token(token)
-            .scopeToProject(Identifier.byName(project), Identifier.byName(keystoneDomainContext))
+            .scopeToProject(Identifier.byName(project), Identifier.byId(keystoneDomainContext))
             .authenticate();
     }
 
