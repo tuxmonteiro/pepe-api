@@ -28,12 +28,17 @@ import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("unused")
 @RestController
+@RequestMapping(value = {"/event", "/{apiVersion:.+}/event"},
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
 public class EventController {
 
     private final KeystoneService keystoneService;
@@ -50,8 +55,8 @@ public class EventController {
         this.jsonLoggerService = jsonLoggerService;
     }
 
-    @PostMapping(name = "/event", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JsonNode> post(@RequestBody JsonNode body) {
+    @PostMapping
+    public ResponseEntity<JsonNode> post(@PathVariable(required = false) String apiVersion, @RequestBody JsonNode body) {
         try {
             final Event event = mapper.convertValue(body, Event.class);
             final Metadata metadata = sanitizeAndExtractMetadata(event);
