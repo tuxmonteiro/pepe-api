@@ -34,14 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SuppressWarnings("unused")
 @RestController
-public class ApiController {
+public class EventController {
 
     private final KeystoneService keystoneService;
     private final ChapolinService chapolinService;
     private final ObjectMapper mapper;
     private final JsonLoggerService jsonLoggerService;
 
-    public ApiController(KeystoneService keystoneService,
+    public EventController(KeystoneService keystoneService,
         ChapolinService chapolinService,
         ObjectMapper mapper, JsonLoggerService jsonLoggerService) {
         this.keystoneService = keystoneService;
@@ -50,7 +50,7 @@ public class ApiController {
         this.jsonLoggerService = jsonLoggerService;
     }
 
-    @PostMapping(name = "/api", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(name = "/event", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JsonNode> post(@RequestBody JsonNode body) {
         try {
             final Event event = mapper.convertValue(body, Event.class);
@@ -60,7 +60,7 @@ public class ApiController {
             if (keystoneService.authenticate(project, token)) {
                 chapolinService.from(event).send();
                 final JsonNode resultBody = mapper.valueToTree(event);
-                return ResponseEntity.created(URI.create("/api")).body(resultBody);
+                return ResponseEntity.created(URI.create("/event")).body(resultBody);
             }
         } catch (RuntimeException e) {
             jsonLoggerService.newLogger(getClass()).put("short_message", e.getMessage() + ": " + body).sendError();
