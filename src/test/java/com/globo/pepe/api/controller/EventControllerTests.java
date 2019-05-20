@@ -121,7 +121,7 @@ public class EventControllerTests {
             + "      \"project\" : {\n"
             + "        \"name\" : \"admin\",\n"
             + "        \"domain\" : {\n"
-            + "          \"name\" : \"default\"\n"
+            + "          \"id\" : \"default\"\n"
             + "        }\n"
             + "      }\n"
             + "    }\n"
