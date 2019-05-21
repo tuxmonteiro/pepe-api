@@ -16,6 +16,7 @@
 
 package com.globo.pepe.api.controller;
 
+import com.globo.pepe.common.services.JsonLoggerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,17 +42,19 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 
 @RestController
-@RequestMapping(value = "/{path:^(?!event|admin).*}")
 public class ProxyController {
 
     private final RestTemplate restTemplate;
+    private final JsonLoggerService loggerService;
     private final Map<String, String> destinations;
 
     public ProxyController(RestTemplate restTemplate,
+        JsonLoggerService loggerService,
         @Value("${pepe.stackstorm.api}") String pepeStackstormApi,
         @Value("${pepe.stackstorm.auth}") String pepeStackstormAuth,
         @Value("${pepe.stackstorm.stream}") String pepeStackstormStream) {
 
+        this.loggerService = loggerService;
         this.restTemplate = restTemplate;
         this.destinations = Map.of(
             "api", pepeStackstormApi,
@@ -60,7 +64,8 @@ public class ProxyController {
     }
 
     @ResponseBody
-    public ResponseEntity<String> proxy(
+    @RequestMapping(value = "/admin/{path:.+}", method = RequestMethod.POST)
+    public ResponseEntity<String> post(
         @PathVariable String path,
         @RequestBody(required = false) String body,
         @RequestHeader(required = false) HttpHeaders headers,
@@ -69,7 +74,9 @@ public class ProxyController {
 
         String destUrl = destinations.get(path);
         if (destUrl == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("path /" + path + " NOT FOUND");
+            String message = "path /admin/" + path + " NOT FOUND";
+            loggerService.newLogger(getClass()).message(message).sendError();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
 
         final MultiValueMap<String, String> multiMapParams = new LinkedMultiValueMap<>();
