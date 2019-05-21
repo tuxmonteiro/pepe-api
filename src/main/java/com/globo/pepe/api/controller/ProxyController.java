@@ -78,9 +78,6 @@ public class ProxyController {
             loggerService.newLogger(getClass()).message(message).sendError();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
-
-        System.out.println(destUrl + path);
-
         final MultiValueMap<String, String> multiMapParams = new LinkedMultiValueMap<>();
         if (params != null) {
             params.forEach((k, v) -> multiMapParams.put(k, singletonList(v)));
