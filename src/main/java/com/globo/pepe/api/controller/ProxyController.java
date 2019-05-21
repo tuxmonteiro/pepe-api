@@ -72,7 +72,7 @@ public class ProxyController {
         HttpServletRequest request) throws RuntimeException {
 
         String path = request.getRequestURI().replace("/admin", "");
-        String destUrl = destinations.get(path.replaceAll("^/([^/]+)/.*", "$1"));
+        String destUrl = destinations.get(path.replaceAll("^/([^/]+)[/]?.*", "$1"));
         if (destUrl == null) {
             String message = "path /admin" + path + " NOT FOUND";
             loggerService.newLogger(getClass()).message(message).sendError();
