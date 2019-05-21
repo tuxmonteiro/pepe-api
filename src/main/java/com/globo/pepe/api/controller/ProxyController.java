@@ -17,6 +17,7 @@
 package com.globo.pepe.api.controller;
 
 import com.globo.pepe.common.services.JsonLoggerService;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,11 +26,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,26 +63,29 @@ public class ProxyController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/admin/{path:.+}", method = RequestMethod.POST)
-    public ResponseEntity<String> post(
-        @PathVariable String path,
+    @RequestMapping(value = "/admin/**")
+    public ResponseEntity<String> proxy(
         @RequestBody(required = false) String body,
         @RequestHeader(required = false) HttpHeaders headers,
         @RequestParam(required = false) Map<String, String> params,
-        HttpMethod method) throws RuntimeException {
+        HttpMethod method,
+        HttpServletRequest request) throws RuntimeException {
 
-        String destUrl = destinations.get(path);
+        String path = request.getRequestURI().replace("/admin", "");
+        String destUrl = destinations.get(path.replaceAll("^/([^/]+)/.*", "$1"));
         if (destUrl == null) {
-            String message = "path /admin/" + path + " NOT FOUND";
+            String message = "path /admin" + path + " NOT FOUND";
             loggerService.newLogger(getClass()).message(message).sendError();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
+
+        System.out.println(destUrl + path);
 
         final MultiValueMap<String, String> multiMapParams = new LinkedMultiValueMap<>();
         if (params != null) {
             params.forEach((k, v) -> multiMapParams.put(k, singletonList(v)));
         }
-        String newUri = UriComponentsBuilder.fromUri(URI.create(destUrl)).path("/" + path)
+        String newUri = UriComponentsBuilder.fromUri(URI.create(destUrl)).path(path)
             .queryParams(multiMapParams).build().toUriString();
         final HttpEntity<?> requestData = new HttpEntity<>(body, headers);
 
