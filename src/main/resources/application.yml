@@ -15,9 +15,9 @@ pepe:
   event:
     ttl: ${EVENT_TTL:10000}
   stackstorm:
-    api: ${STACKSTORM_URL:http://127.0.0.0:9101/api/v1}
-    auth: ${STACKSTORM_URL:http://127.0.0.0:9101/auth/v1}
-    stream: ${STACKSTORM_URL:http://127.0.0.0:9101/stream/v1}
+    api: ${STACKSTORM_API_URL:http://127.0.0.0:9101/api/v1}
+    auth: ${STACKSTORM_AUTH_URL:http://127.0.0.0:9101/auth/v1}
+    stream: ${STACKSTORM_STREAM_URL:http://127.0.0.0:9101/stream/v1}
     key: ${STACKSTORM_KEY:NOT_KEY}
 
 amqp:
