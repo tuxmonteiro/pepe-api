@@ -48,7 +48,8 @@ public class EventController {
 
     public EventController(KeystoneService keystoneService,
         ChapolinService chapolinService,
-        ObjectMapper mapper, JsonLoggerService jsonLoggerService) {
+        ObjectMapper mapper,
+        JsonLoggerService jsonLoggerService) {
         this.keystoneService = keystoneService;
         this.chapolinService = chapolinService;
         this.mapper = mapper;
@@ -68,7 +69,7 @@ public class EventController {
                 return ResponseEntity.created(URI.create("/event")).body(resultBody);
             }
         } catch (RuntimeException e) {
-            jsonLoggerService.newLogger(getClass()).put("short_message", e.getMessage() + ": " + body).sendError();
+            jsonLoggerService.newLogger(getClass()).message(e.getMessage() + ": " + body).sendError();
             return ResponseEntity.status(400).body(mapper.createObjectNode().put("error", e.getMessage()));
         }
 
