@@ -16,9 +16,6 @@
 
 package com.globo.pepe.api.controller;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -37,52 +34,49 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Map;
+
+import static java.util.Collections.singletonList;
+
 @RestController
-@RequestMapping(value = "/{name:^(?!event).*}")
+@RequestMapping(value = "/{path:^(?!event|admin).*}")
 public class ProxyController {
 
-    @Value("${pepe.stackstorm.api}")
-    private String pepeStackstormApi;
-
-    @Value("${pepe.stackstorm.auth}")
-    private String pepeStackstormAuth;
-
-    @Value("${pepe.stackstorm.stream}")
-    private String pepeStackstormStream;
-
     private final RestTemplate restTemplate;
+    private final Map<String, String> destinations;
 
-    public ProxyController(RestTemplate restTemplate) {
+    public ProxyController(RestTemplate restTemplate,
+        @Value("${pepe.stackstorm.api}") String pepeStackstormApi,
+        @Value("${pepe.stackstorm.auth}") String pepeStackstormAuth,
+        @Value("${pepe.stackstorm.stream}") String pepeStackstormStream) {
+
         this.restTemplate = restTemplate;
+        this.destinations = Map.of(
+            "api", pepeStackstormApi,
+            "auth", pepeStackstormAuth,
+            "stream", pepeStackstormStream
+        );
     }
 
     @ResponseBody
-    public ResponseEntity<String> engine(
+    public ResponseEntity<String> proxy(
         @PathVariable String path,
         @RequestBody(required = false) String body,
         @RequestHeader(required = false) HttpHeaders headers,
         @RequestParam(required = false) Map<String, String> params,
         HttpMethod method) throws RuntimeException {
 
-        String destUrl = "";
-        if (path.startsWith("api")) {
-            destUrl = pepeStackstormApi;
-        }
-        if (path.startsWith("auth")) {
-            destUrl = pepeStackstormAuth;
-        }
-        if (path.startsWith("stream")) {
-            destUrl = pepeStackstormStream;
-        }
-        if (destUrl.isEmpty()) {
-            return new ResponseEntity<>("path " + path + " NOT FOUND", null, HttpStatus.NOT_FOUND);
+        String destUrl = destinations.get(path);
+        if (destUrl == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("path /" + path + " NOT FOUND");
         }
 
         final MultiValueMap<String, String> multiMapParams = new LinkedMultiValueMap<>();
         if (params != null) {
-            params.forEach((k, v) -> multiMapParams.put(k, new ArrayList<String>(){{add(v);}}));
+            params.forEach((k, v) -> multiMapParams.put(k, singletonList(v)));
         }
-        String newUri = UriComponentsBuilder.fromUri(URI.create(destUrl)).path(path)
+        String newUri = UriComponentsBuilder.fromUri(URI.create(destUrl)).path("/" + path)
             .queryParams(multiMapParams).build().toUriString();
         final HttpEntity<?> requestData = new HttpEntity<>(body, headers);
 
