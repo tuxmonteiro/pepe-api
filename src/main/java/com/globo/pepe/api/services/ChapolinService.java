@@ -47,7 +47,7 @@ public class ChapolinService {
 
     public EventInstance from(final Event event) {
         Metadata metadata = event.getMetadata();
-        String queueName = PACK_NAME + "." + TRIGGER_PREFIX + "." + metadata.getTriggerName();
+        String queueName = PACK_NAME + "." + TRIGGER_PREFIX + "." + metadata.getProject() + "." + metadata.getTriggerName();
         return new EventInstance(event, metadata, queueName);
     }
 
