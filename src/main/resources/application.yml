@@ -39,12 +39,20 @@ server:
   port: ${PORT:8000}
 
 logbook:
-  write:
-    level: DEBUG
+  include:
+    - /**
+  exclude:
+    - /actuator/health
+    - /health
+    - /info
+  filter:
+    enabled: true
+  format:
+    style: json
   obfuscate:
-    headers: [Authorization,X-Auth-Token]
-
-logging:
-  level:
-    http:
-      wire-log: DEBUG
+    headers:
+      - Authorization
+      - X-Auth-Token
+  write:
+    chunk-size: 1000
+    level: info
