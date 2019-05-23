@@ -37,3 +37,14 @@ spring:
 
 server:
   port: ${PORT:8000}
+
+logbook:
+  write:
+    level: DEBUG
+  obfuscate:
+    headers: [Authorization,X-Auth-Token]
+
+logging:
+  level:
+    http:
+      wire-log: DEBUG
