@@ -40,6 +40,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -50,7 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "pepe.logging.tags=default",
     "pepe.stackstorm.api=http://127.0.0.1:9000",
     "pepe.stackstorm.auth=http://127.0.0.1:9000",
-    "pepe.stackstorm.stream=http://127.0.0.1:9000"
+    "pepe.stackstorm.stream=http://127.0.0.1:9000",
+    "pepe.api.origins=http://xxx"
 })
 public class ProxyControllerTests {
 
@@ -323,6 +325,22 @@ public class ProxyControllerTests {
     public void proxyOtherHeadTest() throws Exception {
         mockMvc.perform(head("/admin/other/testother"))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void corsTest() throws Exception {
+        mockMvc.perform(get("/healthcheck")
+            .header("Origin", "http://xxx"))
+            .andExpect(status().isOk())
+            .andDo(print());
+    }
+
+    @Test
+    public void corsFailTest() throws Exception {
+        mockMvc.perform(get("/healthcheck")
+            .header("Origin", "http://yyy"))
+            .andExpect(status().isForbidden())
+            .andDo(print());
     }
 
 }

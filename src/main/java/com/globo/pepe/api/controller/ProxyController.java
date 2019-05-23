@@ -17,7 +17,6 @@
 package com.globo.pepe.api.controller;
 
 import com.globo.pepe.common.services.JsonLoggerService;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -40,7 +39,6 @@ import java.net.URI;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static org.springframework.http.HttpHeaders.*;
 
 @RestController
 public class ProxyController {
@@ -88,26 +86,7 @@ public class ProxyController {
             .queryParams(multiMapParams).build().toUriString();
         final HttpEntity<?> requestData = new HttpEntity<>(body, headers);
 
-        ResponseEntity<String> realResponse = restTemplate.exchange(newUri, method, requestData, String.class);
-        String realResponseBody = realResponse.getBody();
-        HttpStatus realResponseStatusCode = realResponse.getStatusCode();
-        MultiValueMap<String, String> headersModified = new HttpHeaders();
-        realResponse.getHeaders().forEach((k, v) -> {
-            if (!headersToRemove().contains(k)) {
-                headersModified.put(k, v);
-            }
-        });
-        return new ResponseEntity<>(realResponseBody, headersModified, realResponseStatusCode);
-    }
-
-    private List<String> headersToRemove() {
-        return List.of(
-            ACCESS_CONTROL_MAX_AGE,
-            ACCESS_CONTROL_ALLOW_CREDENTIALS,
-            ACCESS_CONTROL_ALLOW_HEADERS,
-            ACCESS_CONTROL_ALLOW_METHODS,
-            ACCESS_CONTROL_ALLOW_ORIGIN
-        );
+        return restTemplate.exchange(newUri, method, requestData, String.class);
     }
 
 }
