@@ -128,10 +128,9 @@ public class EventControllerTests {
             + "  }\n"
             + "}";
     }
-    private JsonNode metadata(String project, String token, String source, Long timestamp, String triggerName) {
+    private JsonNode metadata(String project, String source, Long timestamp, String triggerName) {
         final Metadata metadata = new Metadata()
                 .setProject(project)
-                .setToken(token)
                 .setSource(source)
                 .setTimestamp(timestamp)
                 .setTriggerName(triggerName);
@@ -146,32 +145,24 @@ public class EventControllerTests {
         return ((ObjectNode)metadata()).set("custom_attributes", customAttributes);
     }
 
-    private JsonNode metadata(String token, String source, Long timestamp, String triggerName) {
-        return metadata(null, token, source, timestamp, triggerName);
-    }
-
     private JsonNode metadata(String source, Long timestamp, String triggerName) {
-        return metadata(null, null, source, timestamp, triggerName);
+        return metadata(null, source, timestamp, triggerName);
     }
 
     private JsonNode metadata(Long timestamp, String triggerName) {
-        return metadata(null, null, null, timestamp, triggerName);
+        return metadata(null, null, timestamp, triggerName);
     }
 
     private JsonNode metadata(String source, String triggerName) {
-        return metadata(null, null, source, null, triggerName);
+        return metadata(null, source, null, triggerName);
     }
 
     private JsonNode metadata(String source, Long timestamp) {
-        return metadata(null, null, source, timestamp, null);
-    }
-
-    private JsonNode metadata(String token) {
-        return metadata("admin", token, "asource", 0L, " ");
+        return metadata(null, source, timestamp, null);
     }
 
     private JsonNode metadata() {
-        return metadata("token-ok");
+        return metadata("admin", "asource", 0L, " ");
     }
 
     @AfterClass
@@ -184,39 +175,30 @@ public class EventControllerTests {
     @Test
     public void idMissingTest() throws Exception {
         String eventWithoutAuth = "{\"payload\":{},\"metadata\":" + metadata("asource", 0L, "atrigger") + "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void metadataMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{}}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void payloadMissingTests() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"metadata\":" + metadata("asource", 0L, "atrigger") + "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void metadataProjectMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
-            metadata(null, "token-ok", "asource", 0L, "atrigger") +
+            metadata(null, "asource", 0L, "atrigger") +
             "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
-            .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void metadataTokenMissingTest() throws Exception {
-        String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" +
-            metadata("admin", null, "asource", 0L, "atrigger") +
-            "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
@@ -224,7 +206,7 @@ public class EventControllerTests {
     public void metadataSourceMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata(0L, "atrigger") +
                 "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
@@ -232,7 +214,7 @@ public class EventControllerTests {
     public void metadataTimestampMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("asource", "atrigger") +
                 "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
@@ -240,44 +222,44 @@ public class EventControllerTests {
     public void metadataTriggerMissingTest() throws Exception {
         String eventWithoutAuth = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("asource", 0L) +
                 "}";
-        mockMvc.perform(post("/event").content(eventWithoutAuth)
+        mockMvc.perform(post("/event").content(eventWithoutAuth).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isBadRequest());
     }
 
     @Test
     public void eventControllerNotAuthenticationTest() throws Exception {
         setField(keystoneService, "securityDisabled", true);
-        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("token-ok") + "}";
-        mockMvc.perform(post("/event").content(eventWithAuthOK)
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata() + "}";
+        mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "wrong-token")
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
         setField(keystoneService, "securityDisabled", false);
     }
 
     @Test
     public void eventControllerAuthenticationOk() throws Exception {
-        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("token-ok") + "}";
-        mockMvc.perform(post("/event").content(eventWithAuthOK)
+        String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata() + "}";
+        mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "token-ok")
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
     @Test
     public void eventControllerAuthenticationFail() throws Exception {
-        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("wrong-token") + "}";
-        mockMvc.perform(post("/event").content(eventWithAuthFail)
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata() + "}";
+        mockMvc.perform(post("/event").content(eventWithAuthFail).header("X-Auth-Token", "wrong-token")
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void eventControllerKeystoneError() throws Exception {
-        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata("force-error") + "}";
-        mockMvc.perform(post("/event").content(eventWithAuthFail)
+        String eventWithAuthFail = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadata() + "}";
+        mockMvc.perform(post("/event").content(eventWithAuthFail).header("X-Auth-Token", "force-error")
             .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void customAttributesTest() throws Exception {
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
-        mockMvc.perform(post("/event").content(eventWithAuthOK)
+        mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "token-ok")
                 .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
     }
 
@@ -291,7 +273,7 @@ public class EventControllerTests {
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
         int numEvents = 10;
         for (int i=0; i<numEvents; i++) {
-            mockMvc.perform(post("/event").content(eventWithAuthOK)
+            mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "token-ok")
                     .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
         }
     }
@@ -305,7 +287,7 @@ public class EventControllerTests {
         String eventWithAuthOK = "{\"id\":\"xxx\",\"payload\":{},\"metadata\":" + metadataWithCustomAttributes() + "}";
         int numEvents = 10;
         for (int i=0; i<numEvents; i++) {
-            mockMvc.perform(post("/event").content(eventWithAuthOK)
+            mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "token-ok")
                     .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
         }
     }

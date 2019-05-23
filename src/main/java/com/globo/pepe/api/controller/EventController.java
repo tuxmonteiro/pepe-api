@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,12 +58,13 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<JsonNode> post(@PathVariable(required = false) String apiVersion, @RequestBody JsonNode body) {
+    public ResponseEntity<JsonNode> post(@PathVariable(required = false) String apiVersion,
+        @RequestHeader("X-Auth-Token") String token,
+        @RequestBody JsonNode body) {
         try {
             final Event event = mapper.convertValue(body, Event.class);
             final Metadata metadata = sanitizeAndExtractMetadata(event);
             final String project = Optional.ofNullable(metadata.getProject()).orElse("");
-            final String token = Optional.ofNullable(metadata.getToken()).orElse("");
             if (keystoneService.authenticate(project, token)) {
                 chapolinService.from(event).send();
                 final JsonNode resultBody = mapper.valueToTree(event);
@@ -82,7 +84,6 @@ public class EventController {
         Assert.notNull(metadata = event.getMetadata(), "metadata NOT FOUND");
         Assert.notNull(event.getPayload(), "payload NOT FOUND");
         Assert.notNull(metadata.getProject(), "metadata.project NOT FOUND");
-        Assert.notNull(metadata.getToken(), "metadata.token NOT FOUND");
         Assert.notNull(metadata.getSource(), "metadata.source NOT FOUND");
         Assert.notNull(metadata.getTimestamp(), "metadata.timestamp NOT FOUND");
         Assert.notNull(metadata.getTriggerName(), "metadata.trigger_name NOT FOUND");
