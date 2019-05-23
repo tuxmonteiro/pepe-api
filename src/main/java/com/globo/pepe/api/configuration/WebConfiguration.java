@@ -27,12 +27,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfiguration implements WebMvcConfigurer {
 
     @Value("${pepe.api.origins}")
-    private String pepeOrigin;
+    private String pepeOrigins;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins(pepeOrigin)
+            .allowedOrigins(Stream.of(pepeOrigins.split(",")).map(String::trim).toArray(String[]::new))
             .allowedMethods(Stream.of(HttpMethod.values()).map(HttpMethod::name).toArray(String[]::new))
             .allowCredentials(true)
             .maxAge(3600);
