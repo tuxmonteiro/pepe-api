@@ -18,7 +18,6 @@ package com.globo.pepe.api.controller;
 
 import com.globo.pepe.api.configuration.RestTemplateConfiguration;
 import com.globo.pepe.common.services.JsonLoggerService;
-import java.util.List;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
