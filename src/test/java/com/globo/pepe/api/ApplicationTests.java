@@ -13,7 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
     "spring.pid.file=/tmp/pepe.pid",
 	"pepe.stackstorm.api=http://127.0.0.1:9000/api",
 	"pepe.stackstorm.auth=http://127.0.0.1:9000/auth",
-	"pepe.stackstorm.stream=http://127.0.0.1:9000/stream"
+	"pepe.stackstorm.stream=http://127.0.0.1:9000/stream",
+    "pepe.api.origins=*"
 })
 public class ApplicationTests {
 

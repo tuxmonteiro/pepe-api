@@ -16,6 +16,7 @@
 
 package com.globo.pepe.api.configuration;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins(Stream.of(pepeOrigins.split(",")).map(String::trim).toArray(String[]::new))
+            .allowedOrigins(Collections.singletonList(pepeOrigins).toArray(new String[0]))
             .allowedMethods(Stream.of(HttpMethod.values()).map(HttpMethod::name).toArray(String[]::new))
             .allowCredentials(true)
             .maxAge(3600);
