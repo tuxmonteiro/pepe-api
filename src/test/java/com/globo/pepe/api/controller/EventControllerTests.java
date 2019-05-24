@@ -22,7 +22,8 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,11 +53,27 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({EventController.class, KeystoneService.class, ChapolinService.class, AmqpService.class, JsonLoggerService.class, ObjectMapper.class})
+@WebMvcTest({
+    EventController.class,
+    KeystoneService.class,
+    ChapolinService.class,
+    AmqpService.class,
+    JsonLoggerService.class,
+    ObjectMapper.class
+})
+@TestPropertySource(properties = {
+    "pepe.logging.tags=default",
+    "spring.pid.file=/tmp/pepe.pid",
+    "pepe.stackstorm.api=http://127.0.0.1:9000/api",
+    "pepe.stackstorm.auth=http://127.0.0.1:9000/auth",
+    "pepe.stackstorm.stream=http://127.0.0.1:9000/stream",
+    "pepe.api.origins=http://xxx"
+})
 public class EventControllerTests {
 
     @MockBean
@@ -290,6 +307,20 @@ public class EventControllerTests {
             mockMvc.perform(post("/event").content(eventWithAuthOK).header("X-Auth-Token", "token-ok")
                     .contentType(APPLICATION_JSON_VALUE)).andExpect(status().isCreated());
         }
+    }
+    
+    @Test
+    public void corsTest() throws Exception {
+        mockMvc.perform(get("/healthcheck").header("Origin", "http://xxx"))
+            .andExpect(status().isOk())
+            .andDo(print());
+    }
+
+    @Test
+    public void corsFailTest() throws Exception {
+        mockMvc.perform(get("/healthcheck").header("Origin", "http://yyy"))
+            .andExpect(status().isForbidden())
+            .andDo(print());
     }
 
 }
