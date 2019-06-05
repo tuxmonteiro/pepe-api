@@ -18,10 +18,6 @@
 <Configuration status="WARN">
   <Properties>
     <Property name="LOGLEVEL">INFO</Property>
-    <Property name="HOSTNAME">localhost</Property>
-    <Property name="SYSLOG_HOST">localhost</Property>
-    <Property name="SYSLOG_PORT">514</Property>
-    <Property name="hostname">${env:HOSTNAME}</Property>
     <Property name="syslog_host">${env:SYSLOG_HOST}</Property>
     <Property name="syslog_port">${env:SYSLOG_PORT}</Property>
   </Properties>
