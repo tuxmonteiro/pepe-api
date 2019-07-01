@@ -14,6 +14,9 @@ pepe:
     disabled: false
   event:
     ttl: 10000
+  cors:
+    origins: http://xxx
+    methods: GET,POST,DELETE,PATCH,PUT,HEAD,OPTIONS,TRACE,CONNECT
 
 amqp:
   url: amqp://guest:guest@127.0.0.1

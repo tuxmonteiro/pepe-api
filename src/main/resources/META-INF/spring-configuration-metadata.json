@@ -44,7 +44,16 @@
       "name": "pepe.event.ttl",
       "type": "java.lang.Long",
       "description": "Event TTL"
+    },
+    {
+      "name": "pepe.cors.origins",
+      "type": "java.lang.String",
+      "description": "Define CORS Allow-Origin."
+    },
+    {
+      "name": "pepe.cors.methods",
+      "type": "java.lang.String",
+      "description": "Define CORS Allow-Methods."
     }
-
   ]
 }
