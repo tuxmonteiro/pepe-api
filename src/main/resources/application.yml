@@ -29,7 +29,19 @@ amqp:
     login: ${RABBIT_MANAGEMENT_LOGIN:guest}
     password: ${RABBIT_MANAGEMENT_PASSWORD:guest}
 
+
 spring:
+  data:
+    rest:
+      basePath: /munin/v1
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=MySQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
   cache:
     cache-names: userids
     caffeine:
