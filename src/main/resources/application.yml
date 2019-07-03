@@ -19,8 +19,9 @@ pepe:
     auth: ${STACKSTORM_AUTH_URL:http://127.0.0.0:9100/auth/v1}
     stream: ${STACKSTORM_STREAM_URL:http://127.0.0.0:9102/stream/v1}
     key: ${STACKSTORM_KEY:NOT_KEY}
-  api:
+  cors:
     origins: ${PEPE_CORS_ORIGINS:*}
+    methods: ${PEPE_CORS_METHODS:GET,POST,DELETE,PATCH,PUT,HEAD,OPTIONS,TRACE,CONNECT}
 
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}
@@ -29,7 +30,19 @@ amqp:
     login: ${RABBIT_MANAGEMENT_LOGIN:guest}
     password: ${RABBIT_MANAGEMENT_PASSWORD:guest}
 
+
 spring:
+  data:
+    rest:
+      basePath: /munin/v1
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=MySQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create
   cache:
     cache-names: userids
     caffeine:
