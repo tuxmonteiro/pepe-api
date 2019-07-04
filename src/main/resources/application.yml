@@ -30,7 +30,6 @@ amqp:
     login: ${RABBIT_MANAGEMENT_LOGIN:guest}
     password: ${RABBIT_MANAGEMENT_PASSWORD:guest}
 
-
 spring:
   data:
     rest:
