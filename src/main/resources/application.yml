@@ -33,15 +33,15 @@ amqp:
 spring:
   data:
     rest:
-      basePath: /munin/v1
+      basePath: ${PEPE_MUNIN_API_BASE:/munin/v1}
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=MySQL
-    username: sa
-    password:
+    driver-class-name: ${DB_API_DRIVER:org.h2.Driver}
+    url: ${DB_API_URL:jdbc:h2:mem:test;MODE=MySQL}
+    username: ${DB_API_USER:sa}
+    password: ${DB_API_PASSWORD:}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: ${DB_API_DDL:create}
   cache:
     cache-names: userids
     caffeine:
