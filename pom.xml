@@ -59,6 +59,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>8</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
+
+        <caffeine.version>2.7.0</caffeine.version>
+        <h2.version>1.4.199</h2.version>
+        <jackson-databind.version>[2.9.9,)</jackson-databind.version>
+        <lmax-disruptor.version>3.4.2</lmax-disruptor.version>
+        <logbook.version>1.13.0</logbook.version>
+        <mysql-connector.version>8.0.16</mysql-connector.version>
+        <openstack4j.version>3.2.0</openstack4j.version>
+        <spring-rabbit.version>2.1.5.RELEASE</spring-rabbit.version>
     </properties>
 
     <dependencies>
@@ -96,12 +105,12 @@
         <dependency>
             <groupId>org.pacesys</groupId>
             <artifactId>openstack4j</artifactId>
-            <version>3.2.0</version>
+            <version>${openstack4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.amqp</groupId>
             <artifactId>spring-rabbit</artifactId>
-            <version>2.1.5.RELEASE</version>
+            <version>${spring-rabbit.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,22 +119,32 @@
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>2.7.0</version>
+            <version>${caffeine.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
-            <version>3.4.2</version>
+            <version>${lmax-disruptor.version}</version>
         </dependency>
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>logbook-spring-boot-starter</artifactId>
-            <version>1.13.0</version>
+            <version>${logbook.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.199</version>
+            <version>${h2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector.version}</version>
         </dependency>
 
         <dependency>
@@ -156,11 +175,6 @@
             <artifactId>rabbitmq-mock</artifactId>
             <version>1.0.10</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>[2.9.9,)</version>
         </dependency>
     </dependencies>
 
@@ -209,8 +223,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>
