@@ -38,8 +38,12 @@ spring:
     username: ${DB_API_USER:sa}
     password: ${DB_API_PASSWORD:}
   jpa:
+    show-sql: ${DB_API_SHOWSQL:false}
     hibernate:
       ddl-auto: ${DB_API_DDL:create}
+    properties:
+      hibernate:
+        dialect: ${DB_API_DIALECT:org.hibernate.dialect.H2Dialect}
   cache:
     cache-names: userids
     caffeine:
