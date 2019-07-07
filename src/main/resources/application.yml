@@ -42,6 +42,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${DB_API_DDL:create}
+    properties:
+      hibernate:
+        dialect: ${DB_API_DIALECT:org.hibernate.dialect.H2Dialect}
   cache:
     cache-names: userids
     caffeine:
@@ -50,7 +53,7 @@ spring:
     file: ${PID_FILE:/tmp/pepe-api.pid}
 
 server:
-  port: ${PORT:8000}
+  port: ${SERVER_PORT:8000}
 
 logbook:
   include:
