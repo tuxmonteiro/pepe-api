@@ -29,7 +29,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnablePepeCommon
 @SpringBootApplication
 @EntityScan( basePackages = {"com.globo.pepe.common.model.munin"} )
-@EnableJpaRepositories(basePackages = "com.globo.pepe.common.repository.munin")
+@EnableJpaRepositories(basePackages = "com.globo.pepe.api.repository")
 @Import({DatabaseConfiguration.class})
 public class Application {
 
