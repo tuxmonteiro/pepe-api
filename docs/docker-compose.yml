@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: pepe
+    ports:
+      - 3306:3306
+
+  fake-oauth2:
+    image: tuxmonteiro/galeb-fake-oauth2
+    container_name: fake-oauth2
+    ports:
+      - 9000:9000
