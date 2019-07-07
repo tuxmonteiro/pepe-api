@@ -7,10 +7,10 @@ START TRANSACTION;
 
 CREATE TABLE `driver` (
   `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `created_by` varchar(255) NOT NULL,
-  `last_modified_at` datetime(6) NOT NULL,
-  `last_modified_by` varchar(255) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `created_by` varchar(255) NOT NULL DEFAULT 'anonymous',
+  `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
   `jar` varchar(255) DEFAULT NULL,
   `type` varchar(255) NOT NULL,
@@ -24,10 +24,10 @@ CREATE TABLE `driver` (
 
 CREATE TABLE `connection` (
   `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `created_by` varchar(255) NOT NULL,
-  `last_modified_at` datetime(6) NOT NULL,
-  `last_modified_by` varchar(255) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `created_by` varchar(255) NOT NULL DEFAULT 'anonymous',
+  `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
   `login` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
@@ -45,10 +45,10 @@ CREATE TABLE `connection` (
 
 CREATE TABLE `project` (
   `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `created_by` varchar(255) NOT NULL,
-  `last_modified_at` datetime(6) NOT NULL,
-  `last_modified_by` varchar(255) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `created_by` varchar(255) NOT NULL DEFAULT 'anonymous',
+  `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
   `login` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
@@ -62,10 +62,10 @@ CREATE TABLE `project` (
 
 CREATE TABLE `metric` (
   `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
-  `created_at` datetime(6) NOT NULL,
-  `created_by` varchar(255) NOT NULL,
-  `last_modified_at` datetime(6) NOT NULL,
-  `last_modified_by` varchar(255) NOT NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `created_by` varchar(255) NOT NULL DEFAULT 'anonymous',
+  `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
   `query` varchar(255) NOT NULL,
   `connection_id` bigint(20) UNSIGNED NOT NULL,
