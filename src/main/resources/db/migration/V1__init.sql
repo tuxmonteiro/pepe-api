@@ -6,7 +6,7 @@ START TRANSACTION;
 --
 
 CREATE TABLE `driver` (
-  `id` int(11) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `created_by` varchar(255) NOT NULL,
   `last_modified_at` datetime(6) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `driver` (
 --
 
 CREATE TABLE `connection` (
-  `id` int(11) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `created_by` varchar(255) NOT NULL,
   `last_modified_at` datetime(6) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `connection` (
   `login` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `url` varchar(255) NOT NULL,
-  `driver_id` int(11) UNSIGNED NOT NULL,
+  `driver_id` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_connection_name` (`name`),
   KEY `FK_connection_driver` (`driver_id`),
@@ -44,7 +44,7 @@ CREATE TABLE `connection` (
 --
 
 CREATE TABLE `project` (
-  `id` int(11) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `created_by` varchar(255) NOT NULL,
   `last_modified_at` datetime(6) NOT NULL,
@@ -61,15 +61,15 @@ CREATE TABLE `project` (
 --
 
 CREATE TABLE `metric` (
-  `id` int(11) UNSIGNED AUTO_INCREMENT NOT NULL,
+  `id` bigint(20) UNSIGNED AUTO_INCREMENT NOT NULL,
   `created_at` datetime(6) NOT NULL,
   `created_by` varchar(255) NOT NULL,
   `last_modified_at` datetime(6) NOT NULL,
   `last_modified_by` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `query` varchar(255) NOT NULL,
-  `connection_id` int(11) UNSIGNED NOT NULL,
-  `project_id` int(11) UNSIGNED NOT NULL,
+  `connection_id` bigint(20) UNSIGNED NOT NULL,
+  `project_id` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_metric_name` (`name`),
   KEY `FK_metric_connection` (`connection_id`),
