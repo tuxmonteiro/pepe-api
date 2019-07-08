@@ -12,10 +12,12 @@ CREATE TABLE `driver` (
   `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
+  `alias` varchar(255) NOT NULL,
   `jar` varchar(255) DEFAULT NULL,
-  `type` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL DEFAULT 'NOOP',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `UK_driver_name` (`name`)
+  UNIQUE KEY `UK_driver_name` (`name`),
+  UNIQUE KEY `UK_driver_alias` (`alias`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -50,8 +52,8 @@ CREATE TABLE `project` (
   `last_modified_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
-  `login` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
+  `keystone_login` varchar(255) DEFAULT NULL,
+  `keystone_password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_project_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -68,10 +70,12 @@ CREATE TABLE `metric` (
   `last_modified_by` varchar(255) NOT NULL DEFAULT 'anonymous',
   `name` varchar(255) NOT NULL,
   `query` varchar(255) NOT NULL,
+  `trigger` varchar(255) NOT NULL,
   `connection_id` bigint(20) UNSIGNED NOT NULL,
   `project_id` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_metric_name` (`name`),
+  UNIQUE KEY `UK_metric_trigger` (`trigger`),
   KEY `FK_metric_connection` (`connection_id`),
   KEY `FK_metric_project` (`project_id`),
   CONSTRAINT `FK_metric_connection` FOREIGN KEY (`connection_id`) REFERENCES `connection` (`id`),

@@ -44,4 +44,6 @@ public interface DriverProjection {
 
     Driver.Type getType();
 
+    String getAlias();
+
 }

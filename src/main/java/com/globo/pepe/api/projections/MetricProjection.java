@@ -42,6 +42,8 @@ public interface MetricProjection {
 
     String getQuery();
 
+    String getTrigger();
+
     ConnectionProjection getConnection();
 
     ProjectProjection getProject();
