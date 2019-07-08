@@ -30,6 +30,8 @@ amqp:
     password: ${RABBIT_MANAGEMENT_PASSWORD:guest}
 
 spring:
+  flyway:
+    enabled: false
   data:
     rest:
       basePath: ${PEPE_MUNIN_API_BASE:/munin/v1}
