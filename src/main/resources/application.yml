@@ -22,6 +22,7 @@ pepe:
   cors:
     origins: ${PEPE_CORS_ORIGINS:*}
     methods: ${PEPE_CORS_METHODS:GET,POST,DELETE,PATCH,PUT,HEAD,OPTIONS,TRACE,CONNECT}
+  secret: ${PEPE_SECRET:mysecret}
 
 amqp:
   url: ${RABBIT_URL:amqp://guest:guest@127.0.0.1}
