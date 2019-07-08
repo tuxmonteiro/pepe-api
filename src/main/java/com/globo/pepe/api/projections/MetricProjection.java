@@ -17,12 +17,8 @@
 package com.globo.pepe.api.projections;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.globo.pepe.common.model.munin.Connection;
-import com.globo.pepe.common.model.munin.Driver;
 import com.globo.pepe.common.model.munin.Metric;
-import com.globo.pepe.common.model.munin.Project;
 import java.util.Date;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.core.config.Projection;
 
 @Projection(name = "recursive", types = { Metric.class })
