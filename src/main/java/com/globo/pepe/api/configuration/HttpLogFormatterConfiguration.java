@@ -18,16 +18,21 @@ package com.globo.pepe.api.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.Correlation;
 import org.zalando.logbook.HttpLogFormatter;
 import org.zalando.logbook.HttpRequest;
 import org.zalando.logbook.HttpResponse;
 import org.zalando.logbook.JsonHttpLogFormatter;
 import org.zalando.logbook.Precorrelation;
+
+import static org.zalando.logbook.BodyFilter.*;
+import static org.zalando.logbook.BodyFilters.*;
 
 @Configuration
 public class HttpLogFormatterConfiguration {
@@ -64,5 +69,10 @@ public class HttpLogFormatterConfiguration {
             content.put("tags", loggingTags);
             return delegate.format(content);
         }
+    }
+
+    @Bean
+    public BodyFilter bodyFilter() {
+        return merge(defaultValue(), replaceJsonStringProperty(Collections.singleton("password"), "XXX"));
     }
 }
