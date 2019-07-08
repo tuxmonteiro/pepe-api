@@ -46,11 +46,7 @@ public interface MetricProjection {
 
     String getQuery();
 
-    Connection getConnection();
+    ConnectionProjection getConnection();
 
-    @JsonProperty("connection_driver")
-    @Value("#{target.connection.driver}")
-    Driver getConnectionDriver();
-
-    Project getProject();
+    ProjectProjection getProject();
 }

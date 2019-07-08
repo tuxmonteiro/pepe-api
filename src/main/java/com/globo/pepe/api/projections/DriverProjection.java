@@ -17,13 +17,12 @@
 package com.globo.pepe.api.projections;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.globo.pepe.common.model.munin.Connection;
 import com.globo.pepe.common.model.munin.Driver;
 import java.util.Date;
 import org.springframework.data.rest.core.config.Projection;
 
-@Projection(name = "recursive", types = { Connection.class })
-public interface ConnectionProjection {
+@Projection(name = "recursive", types = { Driver.class })
+public interface DriverProjection {
 
     Long getId();
 
@@ -41,5 +40,8 @@ public interface ConnectionProjection {
 
     String getName();
 
-    DriverProjection getDriver();
+    String getJar();
+
+    Driver.Type getType();
+
 }
