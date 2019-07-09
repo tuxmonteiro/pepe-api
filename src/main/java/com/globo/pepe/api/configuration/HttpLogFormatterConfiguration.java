@@ -76,8 +76,8 @@ public class HttpLogFormatterConfiguration {
 
         private String getPrincipal() {
             final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            final String principal = authentication.getName();
-            return principal == null ? "anonymous" : principal;
+            final String principal;
+            return authentication == null || (principal = authentication.getName()) == null ? "anonymous" : principal;
         }
     }
 
