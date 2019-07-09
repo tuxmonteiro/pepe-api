@@ -36,7 +36,7 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
 
     private static final String ST2_TOKEN_HEADER   = "X-Auth-Token";
 
-    @Value("${pepe.stackstorm.auth}")
+    @Value("${pepe.stackstorm.api}")
     private String stackStormApiUrl;
 
     private final JsonLoggerService loggerService;
@@ -62,12 +62,12 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
             loggerService.newLogger(getClass()).message(String.valueOf(e.getCause())).sendError();
         }
         if (authenticated) {
-            loggerService.newLogger(getClass()).message("Login: " + login + " , password: " + password).sendInfo();
+            loggerService.newLogger(getClass()).message("Login " + login + " OK ").sendInfo();
             final UsernamePasswordAuthenticationToken principal = new UsernamePasswordAuthenticationToken(login, password, new ArrayList<>());
             SecurityContextHolder.getContext().setAuthentication(principal);
             return principal;
         }
-        loggerService.newLogger(getClass()).message("Login: " + login + " FAILED. Token Problem.").sendError();
+        loggerService.newLogger(getClass()).message("Login: " + login + " FAILED. Token Problem.").sendWarn();
         return null;
     }
 
