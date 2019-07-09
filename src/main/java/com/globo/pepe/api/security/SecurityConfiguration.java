@@ -38,7 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // @formatter:off
         http
-                .authorizeRequests().regexMatchers("^/info", "^/healthcheck.html", "^/event").permitAll().
+                .authorizeRequests().regexMatchers("^/info", "^/healthcheck", "^/event").permitAll().
             and().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER).
             and().
