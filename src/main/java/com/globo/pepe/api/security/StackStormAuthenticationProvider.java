@@ -56,10 +56,10 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
         String password = authentication.getCredentials().toString();
         boolean authenticated = false;
 
-        final Map<CharSequence, Iterable<String>> apikeyHeaders =
-            Collections.singletonMap(CONTENT_TYPE, Collections.singleton(APPLICATION_JSON_VALUE));
+        final Map<CharSequence, Iterable<String>> tokenHeader =
+            Collections.singletonMap(ST2_TOKEN_HEADER, Collections.singleton(password));
         try {
-            Response responseApikey = httpClient.get(stackStormApiUrl + "/", apikeyHeaders);
+            Response responseApikey = httpClient.get(stackStormApiUrl + "/", tokenHeader);
             authenticated = responseApikey.getStatusCode() == HttpStatus.OK.value();
         } catch (Exception e) {
             loggerService.newLogger(getClass()).message(String.valueOf(e.getCause())).sendError();
