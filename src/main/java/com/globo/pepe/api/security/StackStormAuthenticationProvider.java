@@ -19,13 +19,10 @@ package com.globo.pepe.api.security;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.globo.pepe.api.configuration.HttpClientConfiguration.HttpClient;
 import com.globo.pepe.common.services.JsonLoggerService;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import org.asynchttpclient.Response;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,11 +56,8 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
         String password = authentication.getCredentials().toString();
         boolean authenticated = false;
 
-        final Map<CharSequence, Iterable<String>> apikeyHeaders = new HashMap<CharSequence, Iterable<String>>(){{
-                put(CONTENT_TYPE, Collections.singleton(APPLICATION_JSON_VALUE));
-                put(ST2_TOKEN_HEADER, Collections.singleton(password));
-            }};
-
+        final Map<CharSequence, Iterable<String>> apikeyHeaders =
+            Collections.singletonMap(CONTENT_TYPE, Collections.singleton(APPLICATION_JSON_VALUE));
         try {
             Response responseApikey = httpClient.get(stackStormApiUrl + "/", apikeyHeaders);
             authenticated = responseApikey.getStatusCode() == HttpStatus.OK.value();
