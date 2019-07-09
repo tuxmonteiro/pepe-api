@@ -18,9 +18,9 @@ package com.globo.pepe.api.projections;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.globo.pepe.common.model.munin.Connection;
-import com.globo.pepe.common.model.munin.Driver;
-import java.util.Date;
 import org.springframework.data.rest.core.config.Projection;
+
+import java.util.Date;
 
 @Projection(name = "recursive", types = { Connection.class })
 public interface ConnectionProjection {

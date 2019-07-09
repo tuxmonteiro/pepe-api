@@ -46,16 +46,11 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
 
     private final JsonLoggerService loggerService;
     private final HttpClient httpClient;
-    private final ObjectMapper mapper;
 
-    public StackStormAuthenticationProvider(
-        JsonLoggerService loggerService,
-        HttpClient httpClient,
-        ObjectMapper mapper) {
+    public StackStormAuthenticationProvider(JsonLoggerService loggerService, HttpClient httpClient) {
 
         this.loggerService = loggerService;
         this.httpClient = httpClient;
-        this.mapper = mapper;
     }
 
     @Override
