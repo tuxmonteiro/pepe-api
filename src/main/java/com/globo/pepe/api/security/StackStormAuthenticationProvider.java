@@ -16,9 +16,6 @@
 
 package com.globo.pepe.api.security;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import com.globo.pepe.api.configuration.HttpClientConfiguration.HttpClient;
 import com.globo.pepe.common.services.JsonLoggerService;
 import java.util.ArrayList;

@@ -23,6 +23,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.zalando.logbook.BodyFilter;
 import org.zalando.logbook.Correlation;
 import org.zalando.logbook.HttpLogFormatter;
@@ -57,6 +59,7 @@ public class HttpLogFormatterConfiguration {
         public String format(Precorrelation<HttpRequest> precorrelation) throws IOException {
             final Map<String, Object> content = delegate.prepare(precorrelation);
             content.put("short_message", "Request message");
+            content.put("principal", getPrincipal());
             content.put("tags", loggingTags);
             return delegate.format(content);
         }
@@ -66,8 +69,15 @@ public class HttpLogFormatterConfiguration {
             final Map<String, Object> content = delegate.prepare(correlation);
             content.put("body_response", correlation.getOriginalResponse().getBodyAsString());
             content.put("short_message", "Response message");
+            content.put("principal", getPrincipal());
             content.put("tags", loggingTags);
             return delegate.format(content);
+        }
+
+        private String getPrincipal() {
+            final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            final String principal = authentication.getName();
+            return principal == null ? "anonymous" : principal;
         }
     }
 
