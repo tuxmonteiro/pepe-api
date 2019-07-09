@@ -65,7 +65,7 @@ public class StackStormAuthenticationProvider implements AuthenticationProvider 
             }};
 
         try {
-            Response responseApikey = httpClient.get(stackStormApiUrl + "/filters", apikeyHeaders);
+            Response responseApikey = httpClient.get(stackStormApiUrl + "/", apikeyHeaders);
             authenticated = responseApikey.getStatusCode() == HttpStatus.OK.value();
         } catch (Exception e) {
             loggerService.newLogger(getClass()).message(String.valueOf(e.getCause())).sendError();
