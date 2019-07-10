@@ -45,7 +45,7 @@ public interface MetricProjection {
     String getTrigger();
 
     @JsonProperty("enable")
-    Boolean isEnable();
+    Boolean getEnable();
 
     Long getInterval();
 
