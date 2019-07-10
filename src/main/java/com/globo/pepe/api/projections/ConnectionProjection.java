@@ -41,5 +41,9 @@ public interface ConnectionProjection {
 
     String getName();
 
+    String getUrl();
+
+    String getLogin();
+
     DriverProjection getDriver();
 }

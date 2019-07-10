@@ -44,6 +44,14 @@ public interface MetricProjection {
 
     String getTrigger();
 
+    @JsonProperty("enable")
+    Boolean isEnable();
+
+    Long getInterval();
+
+    @JsonProperty("last_processing")
+    Date getLastProcessing();
+
     ConnectionProjection getConnection();
 
     ProjectProjection getProject();
