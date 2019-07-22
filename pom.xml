@@ -68,7 +68,7 @@
         <logbook.version>1.13.0</logbook.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
         <openstack4j.version>3.2.0</openstack4j.version>
-        <pepe-common.version>1.0.0-SNAPSHOT</pepe-common.version>
+        <pepe-common.version>1.1.0-SNAPSHOT</pepe-common.version>
         <spring-rabbit.version>2.1.5.RELEASE</spring-rabbit.version>
     </properties>
 
