@@ -1,6 +1,5 @@
 RPM_VER=$(PEPE_VERSION)
 VERSION=${RPM_VER}
-RELEASE=$(shell date +%Y%m%d%H%M)
 SERVICE=api
 
 deploy-snapshot:
@@ -26,7 +25,7 @@ dist: package
       -t rpm \
       -n "pepe-${SERVICE}" \
       -v ${RPM_VER} \
-      --iteration ${RELEASE}.el7 \
+      --iteration ${RPM_VER}.el7 \
       -a noarch \
       --rpm-os linux \
       -m 'A-Team <a-team@corp.globo.com>' \
@@ -36,7 +35,7 @@ dist: package
       --after-install rpms/postinstall \
       --before-remove rpms/preremove \
       --after-remove rpms/postremove \
-      -f -p ./dists/pepe-${SERVICE}-${RPM_VER}-${RELEASE}.el7.noarch.rpm \
+      -f -p ./dists/pepe-${SERVICE}-${RPM_VER}.el7.noarch.rpm \
               rpms/pepe-profile.sh=/opt/pepe/${SERVICE}/scripts/pepe.sh \
               rpms/pepe@.service=/usr/lib/systemd/system/pepe@.service \
               rpms/log4j.xml=/opt/pepe/${SERVICE}/conf/log4j.xml \
