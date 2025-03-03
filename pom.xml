@@ -62,14 +62,14 @@
 
         <caffeine.version>2.7.0</caffeine.version>
         <flyway.version>5.2.4</flyway.version>
-        <h2.version>1.4.199</h2.version>
+        <h2.version>2.2.220</h2.version>
         <jackson-databind.version>2.9.9</jackson-databind.version>
         <lmax-disruptor.version>3.4.2</lmax-disruptor.version>
         <logbook.version>1.13.0</logbook.version>
-        <mysql-connector.version>8.0.16</mysql-connector.version>
+        <mysql-connector.version>8.0.28</mysql-connector.version>
         <openstack4j.version>3.2.0</openstack4j.version>
         <pepe-common.version>1.1.2-SNAPSHOT</pepe-common.version>
-        <spring-rabbit.version>2.1.5.RELEASE</spring-rabbit.version>
+        <spring-rabbit.version>3.1.8</spring-rabbit.version>
     </properties>
 
     <dependencies>
@@ -160,7 +160,7 @@
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>
-            <version>2.2.0</version>
+            <version>3.0.1</version>
         </dependency>
 
         <dependency>
