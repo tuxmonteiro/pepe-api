@@ -66,7 +66,7 @@
         <jackson-databind.version>2.9.9</jackson-databind.version>
         <lmax-disruptor.version>3.4.2</lmax-disruptor.version>
         <logbook.version>1.13.0</logbook.version>
-        <mysql-connector.version>8.0.28</mysql-connector.version>
+        <mysql-connector.version>8.0.33</mysql-connector.version>
         <openstack4j.version>3.2.0</openstack4j.version>
         <pepe-common.version>1.1.2-SNAPSHOT</pepe-common.version>
         <spring-rabbit.version>3.1.8</spring-rabbit.version>
