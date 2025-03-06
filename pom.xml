@@ -60,7 +60,7 @@
         <java.version>8</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
 
-        <caffeine.version>2.7.0</caffeine.version>
+        <caffeine.version>2.9.3</caffeine.version>
         <flyway.version>5.2.4</flyway.version>
         <h2.version>2.2.220</h2.version>
         <jackson-databind.version>2.9.9</jackson-databind.version>
