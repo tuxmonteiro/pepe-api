@@ -64,7 +64,7 @@
         <flyway.version>5.2.4</flyway.version>
         <h2.version>2.3.232</h2.version>
         <jackson-databind.version>2.18.2</jackson-databind.version>
-        <lmax-disruptor.version>3.4.2</lmax-disruptor.version>
+        <lmax-disruptor.version>3.4.4</lmax-disruptor.version>
         <logbook.version>1.13.0</logbook.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
         <openstack4j.version>3.2.0</openstack4j.version>
