@@ -62,7 +62,7 @@
 
         <caffeine.version>2.9.3</caffeine.version>
         <flyway.version>5.2.4</flyway.version>
-        <h2.version>2.3.232</h2.version>
+        <h2.version>2.4.240</h2.version>
         <jackson-databind.version>2.20.0</jackson-databind.version>
         <lmax-disruptor.version>3.4.4</lmax-disruptor.version>
         <logbook.version>1.13.0</logbook.version>
